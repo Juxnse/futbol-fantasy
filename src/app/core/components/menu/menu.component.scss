@@ -1,0 +1,41 @@
+.menu {
+  height: 100%;
+  background: linear-gradient(180deg, #1b5e20, #1e3a8a);
+  color: white;
+  padding: 1rem 0;
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+      margin: 0.5rem 0;
+
+      a {
+        display: flex;
+        align-items: center;
+        padding: 0.8rem 1.5rem;
+        color: white;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border-radius: 8px;
+
+        mat-icon {
+          margin-right: 10px;
+        }
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.1);
+          transform: translateX(5px);
+        }
+
+        &.active {
+          background: rgba(255, 255, 255, 0.2);
+          font-weight: bold;
+        }
+      }
+    }
+  }
+}

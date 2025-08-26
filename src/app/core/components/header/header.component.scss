@@ -1,0 +1,45 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(90deg, #1b5e20, #0d47a1);
+  color: white;
+  padding: 10px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;          // ✅ que siempre ocupe todo el ancho
+  box-sizing: border-box;
+
+  .logo {
+    font-size: 1.4rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+  }
+
+  .auth-buttons {
+    display: flex;
+    button {
+      margin-left: 10px;
+    }
+  }
+
+  .user-actions {
+    display: flex;
+    align-items: center;
+
+    span {
+      margin-right: 10px;
+      font-weight: bold;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;   // ✅ redondear imagen
+      object-fit: cover;
+      margin-left: 10px;
+    }
+  }
+}

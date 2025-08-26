@@ -1,0 +1,66 @@
+/* Layout global */
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow-x: hidden; // ✅ evitar scroll horizontal raro
+}
+
+/* HEADER */
+app-header {
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+/* LAYOUT */
+.app-layout {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+/* MENÚ lateral */
+mat-sidenav {
+  width: 220px;
+  background: #1e3a8a;
+  color: white;
+}
+
+/* CONTENIDO */
+mat-sidenav-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.main-container {
+  flex: 1;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* FOOTER */
+app-footer {
+  width: 100%;
+  margin-top: auto;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .app-layout {
+    flex-direction: column;
+  }
+
+  mat-sidenav {
+    width: 100%;
+  }
+
+  .main-container {
+    padding: 1rem;
+    max-width: 100%;
+  }
+}

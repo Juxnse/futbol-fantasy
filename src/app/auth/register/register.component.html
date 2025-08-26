@@ -1,0 +1,62 @@
+<div class="register-container">
+  <h2>Registrarme</h2>
+
+  <form [formGroup]="form" (ngSubmit)="submit()">
+
+    <!-- Nombre -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Nombre visible</mat-label>
+      <input matInput type="text" formControlName="name" placeholder="Tu nombre">
+      <mat-error *ngIf="f['name'].touched && f['name'].invalid">
+        El nombre es obligatorio y debe tener al menos 3 caracteres
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Email -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Email</mat-label>
+      <input matInput type="email" formControlName="email" placeholder="ejemplo@gmail.com">
+      <mat-error *ngIf="f['email'].touched && f['email'].invalid">
+        Ingresa un email válido (solo gmail, outlook o yahoo)
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Contraseña -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Contraseña</mat-label>
+      <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" placeholder="Mínimo 6 caracteres">
+      <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
+        <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
+      <mat-error *ngIf="f['password'].touched && f['password'].invalid">
+        La contraseña es obligatoria y debe tener mínimo 6 caracteres
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Confirmar Contraseña -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Confirmar contraseña</mat-label>
+      <input matInput [type]="hideConfirmPassword ? 'password' : 'text'" formControlName="confirmPassword" placeholder="Repite la contraseña">
+      <button mat-icon-button matSuffix type="button" (click)="hideConfirmPassword = !hideConfirmPassword">
+        <mat-icon>{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
+      <mat-error *ngIf="f['confirmPassword'].touched && form.hasError('passwordMismatch')">
+        Las contraseñas no coinciden
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Botón -->
+    <button mat-raised-button color="primary" class="full-width" type="submit" [disabled]="form.invalid">
+      Registrarme
+    </button>
+
+    <!-- Botón de Google -->
+    <div id="google-btn-register" style="margin-top: 20px; display:flex; justify-content:center;"></div>
+
+    <!-- Enlace a login -->
+    <p class="login-link">
+      ¿Ya tienes cuenta?
+      <a routerLink="/login">Inicia sesión aquí</a>
+    </p>
+  </form>
+</div>

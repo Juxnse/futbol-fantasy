@@ -1,0 +1,29 @@
+.login-container {
+  max-width: 400px;
+  margin: 2rem auto;
+  padding: 2rem;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  text-align: center;
+
+  h2 {
+    margin-bottom: 1.5rem;
+    color: #1e3a8a;
+  }
+
+  .full-width {
+    width: 100%;
+  }
+
+  .google-container {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  .register-link {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+  }
+}

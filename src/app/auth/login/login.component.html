@@ -1,0 +1,42 @@
+<div class="login-container">
+  <h2>Iniciar Sesión</h2>
+
+  <!-- Formulario normal -->
+  <form [formGroup]="form" (ngSubmit)="submit()">
+
+    <!-- Email -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Email</mat-label>
+      <input matInput type="email" formControlName="email" placeholder="ejemplo@email.com">
+      <mat-error *ngIf="f['email'].touched && f['email'].invalid">
+        Ingresa un email válido
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Contraseña -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Contraseña</mat-label>
+      <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password">
+      <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
+        <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
+      <mat-error *ngIf="f['password'].touched && f['password'].invalid">
+        La contraseña es obligatoria (mínimo 6 caracteres)
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Botón normal -->
+    <button mat-raised-button color="primary" class="full-width" type="submit" [disabled]="form.invalid">
+      Iniciar Sesión
+    </button>
+  </form>
+
+  <!-- Botón Google -->
+  <div id="google-btn" class="google-container"></div>
+
+  <!-- Registro -->
+  <p class="register-link">
+    ¿No tienes cuenta?
+    <a routerLink="/register">Regístrate aquí</a>
+  </p>
+</div>

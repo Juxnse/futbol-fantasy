@@ -1,1 +1,40 @@
-/* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
+
+// Incluimos core
+@include mat.core();
+
+// 🎨 Definimos paletas de colores futboleras
+$futbol-fantasy-primary: mat.define-palette(mat.$green-palette, 600); // Verde césped
+$futbol-fantasy-accent: mat.define-palette(mat.$yellow-palette, 500); // Amarillo Selección
+$futbol-fantasy-warn: mat.define-palette(mat.$red-palette, 600);      // Rojo advertencia
+
+// Creamos el tema
+$futbol-fantasy-theme: mat.define-light-theme((
+  color: (
+    primary: $futbol-fantasy-primary,
+    accent: $futbol-fantasy-accent,
+    warn: $futbol-fantasy-warn,
+  ),
+  typography: mat.define-typography-config(),
+  density: 0,
+));
+
+// Aplicamos el tema a todos los componentes
+@include mat.all-component-themes($futbol-fantasy-theme);
+
+// 🎯 Estilos globales adicionales
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Roboto', 'Helvetica Neue', sans-serif;
+  background: linear-gradient(180deg, #eafbea 0%, #ffffff 100%); /* Fondo césped sutil */
+}
+
+h1, h2, h3 {
+  font-weight: bold;
+  color: mat.get-color-from-palette($futbol-fantasy-primary, 700);
+}
+
+button {
+  border-radius: 8px;
+}

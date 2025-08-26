@@ -1,0 +1,34 @@
+.home-container {
+  text-align: center;
+  margin: 0 auto;
+  padding: 2rem;
+  max-width: 900px;
+
+  h1 {
+    font-size: 2rem;
+    color: #1e3a8a;
+
+    span {
+      color: #1b5e20;
+    }
+  }
+
+  p {
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+  }
+}
+
+.cancha-container {
+  margin: 2rem auto;
+  display: flex;
+  justify-content: center;
+
+  svg {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+}
