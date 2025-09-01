@@ -6,15 +6,22 @@
         <span>Inicio</span>
       </a>
     </li>
+
     <li>
       <a routerLink="/about" routerLinkActive="active">
         <mat-icon>info</mat-icon>
         <span>Sobre nosotros</span>
       </a>
     </li>
+
     <li>
-      <!-- Ahora llamamos a openTeam() que valida con UserService -->
-      <a (click)="openTeam()">
+      <!-- Usa routerLink para que el "active" funcione y bloquea con openTeam si no hay sesión -->
+      <a
+        routerLink="/equipos/crear"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: false }"
+        (click)="openTeam($event)"
+      >
         <mat-icon>sports_soccer</mat-icon>
         <span>Mi equipo</span>
       </a>

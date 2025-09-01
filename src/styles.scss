@@ -2,6 +2,7 @@
 
 // Incluimos core
 @include mat.core();
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
 
 // 🎨 Definimos paletas de colores futboleras
 $futbol-fantasy-primary: mat.define-palette(mat.$green-palette, 600); // Verde césped
