@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { AuthService } from '../auth/auth.service';
+import { UserService } from 'src/app/services/user.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -8,14 +8,14 @@ import Swal from 'sweetalert2';
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent {
-  constructor(private authService: AuthService) {}
+  constructor(public userService: UserService) {}
 
   isLoggedIn() {
-    return this.authService.isLoggedIn();
+    return this.userService.isLoggedIn();
   }
 
   logout() {
-    this.authService.logout();
+    this.userService.logoutUser();
     Swal.fire({
       icon: 'info',
       title: 'Sesión cerrada',

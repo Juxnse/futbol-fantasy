@@ -6,15 +6,16 @@
     ⚽ Fútbol Fantasy Colombia
   </div>
 
-  <!-- Botones según sesión -->
+  <!-- 🔹 Si NO hay sesión -->
   <div class="auth-buttons" *ngIf="!isLoggedIn()">
     <button mat-raised-button color="primary" routerLink="/register">Registrarse</button>
     <button mat-raised-button color="primary" routerLink="/login">Iniciar Sesión</button>
   </div>
 
+  <!-- 🔹 Si hay sesión -->
   <div class="user-actions" *ngIf="isLoggedIn()">
     <span>{{ user?.name }}</span>
-    <img [src]="user?.picture" alt="Usuario" class="user-avatar" />
+    <img [src]="user?.picture" alt="Usuario" class="user-avatar" *ngIf="user?.picture" />
     <button mat-icon-button [matMenuTriggerFor]="menu">
       <mat-icon>arrow_drop_down</mat-icon>
     </button>

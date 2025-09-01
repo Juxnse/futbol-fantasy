@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../../../auth/auth.service';
+import { UserService } from 'src/app/services/user.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -9,10 +9,10 @@ import Swal from 'sweetalert2';
   styleUrls: ['./menu.component.scss']
 })
 export class MenuComponent {
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private userService: UserService, private router: Router) {}
 
   openTeam() {
-    if (this.authService.isLoggedIn()) {
+    if (this.userService.isLoggedIn()) {
       this.router.navigate(['/team']);
     } else {
       Swal.fire({

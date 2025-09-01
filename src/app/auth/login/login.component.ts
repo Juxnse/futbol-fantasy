@@ -1,7 +1,7 @@
 import { Component, AfterViewInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../auth.service';
+import { UserService } from 'src/app/services/user.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -17,7 +17,7 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
 
   constructor(
     private fb: FormBuilder,
-    private authService: AuthService,
+    private userService: UserService,
     private router: Router
   ) {
     this.form = this.fb.group({
@@ -34,23 +34,24 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
   submit() {
     if (this.form.valid) {
       const { email, password } = this.form.value;
-      const success = this.authService.login(email, password);
-
-      if (success) {
-        Swal.fire({
-          icon: 'success',
-          title: '✅ Sesión iniciada correctamente',
-          timer: 2000,
-          showConfirmButton: false
-        });
-        this.router.navigate(['/home']);
-      } else {
-        Swal.fire({
-          icon: 'error',
-          title: '❌ Credenciales inválidas',
-          text: 'Revisa tu email o contraseña'
-        });
-      }
+      this.userService.loginUser({ email, password }).subscribe({
+        next: () => {
+          Swal.fire({
+            icon: 'success',
+            title: '✅ Sesión iniciada correctamente',
+            timer: 2000,
+            showConfirmButton: false
+          });
+          this.router.navigate(['/home']);
+        },
+        error: (err) => {
+          Swal.fire({
+            icon: 'error',
+            title: '❌ Credenciales inválidas',
+            text: err.error?.message || 'Revisa tu email o contraseña'
+          });
+        }
+      });
     } else {
       this.form.markAllAsTouched();
     }
@@ -58,10 +59,8 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
 
   /** Renderizar el botón de Google cuando el componente carga */
   ngAfterViewInit(): void {
-    this.authService.initGoogle();
-    this.authService.renderGoogleButton('google-btn');
-
-    // Escuchar el evento emitido por el servicio
+    this.userService.initGoogle();
+    this.userService.renderGoogleButton('google-btn');
     window.addEventListener('googleLoginSuccess', this.googleLoginHandler);
   }
 
@@ -70,7 +69,7 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
     window.removeEventListener('googleLoginSuccess', this.googleLoginHandler);
   }
 
-  /** Se llama desde el servicio cuando el login Google es correcto */
+  /** Se llama cuando el login con Google es correcto */
   onGoogleLoginSuccess() {
     Swal.fire({
       icon: 'success',

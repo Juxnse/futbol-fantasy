@@ -1,6 +1,6 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../../../auth/auth.service';
+import { UserService } from 'src/app/services/user.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -12,25 +12,25 @@ export class HeaderComponent implements OnInit {
   @Output() toggleMenu = new EventEmitter<void>();
   user: any = null;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(public userService: UserService, private router: Router) {}
 
   ngOnInit() {
     this.loadUser();
+    // Reactivar datos si cambia localStorage (ej. Google login)
     window.addEventListener('storage', () => this.loadUser());
     this.router.events.subscribe(() => this.loadUser());
   }
 
   loadUser() {
-    const userStr = localStorage.getItem('ff_user');
-    this.user = userStr ? JSON.parse(userStr) : null;
+    this.user = this.userService.getUserFromLocal();
   }
 
   isLoggedIn() {
-    return this.authService.isLoggedIn();
+    return this.userService.isLoggedIn();
   }
 
   logout() {
-    this.authService.logout();
+    this.userService.logoutUser();
     this.user = null;
     Swal.fire({
       icon: 'info',

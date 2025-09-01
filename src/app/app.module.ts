@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';   // ✅ IMPORTAR AQUÍ
 
 // Routing
 import { AppRoutingModule } from './app-routing.module';
@@ -25,6 +26,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSelectModule } from '@angular/material/select';
 
 @NgModule({
   declarations: [
@@ -41,6 +43,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
     AppRoutingModule,
     BrowserAnimationsModule,
     ReactiveFormsModule,
+    HttpClientModule,   // ✅ AGREGAR AQUÍ
 
     // Angular Material
     MatToolbarModule,
@@ -51,7 +54,8 @@ import { MatSidenavModule } from '@angular/material/sidenav';
     MatIconModule,
     MatMenuModule,
     MatDividerModule,
-    MatSidenavModule
+    MatSidenavModule,
+    MatSelectModule
   ],
   bootstrap: [AppComponent]
 })

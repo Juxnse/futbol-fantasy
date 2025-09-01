@@ -3,12 +3,64 @@
 
   <form [formGroup]="form" (ngSubmit)="submit()">
 
+    <!-- Documento -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Documento</mat-label>
+      <input matInput type="text" formControlName="document" placeholder="Número de documento">
+      <mat-error *ngIf="f['document'].touched && f['document'].invalid">
+        El documento debe tener entre 6 y 15 dígitos
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Tipo Documento -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Tipo Documento</mat-label>
+      <mat-select formControlName="document_type">
+        <mat-option value="CC">Cédula</mat-option>
+        <mat-option value="TI">Tarjeta de Identidad</mat-option>
+        <mat-option value="CE">Cédula Extranjería</mat-option>
+        <mat-option value="NIT">NIT</mat-option>
+        <mat-option value="PA">Pasaporte</mat-option>
+        <mat-option value="RC">Registro Civil</mat-option>
+      </mat-select>
+      <mat-error *ngIf="f['document_type'].touched && f['document_type'].invalid">
+        Selecciona un tipo de documento válido
+      </mat-error>
+    </mat-form-field>
+
     <!-- Nombre -->
     <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Nombre visible</mat-label>
+      <mat-label>Nombre</mat-label>
       <input matInput type="text" formControlName="name" placeholder="Tu nombre">
       <mat-error *ngIf="f['name'].touched && f['name'].invalid">
         El nombre es obligatorio y debe tener al menos 3 caracteres
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Primer apellido -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Primer apellido</mat-label>
+      <input matInput type="text" formControlName="last_name1" placeholder="Primer apellido">
+      <mat-error *ngIf="f['last_name1'].touched && f['last_name1'].invalid">
+        El primer apellido es obligatorio
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Segundo apellido -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Segundo apellido</mat-label>
+      <input matInput type="text" formControlName="last_name2" placeholder="Segundo apellido">
+      <mat-error *ngIf="f['last_name2'].touched && f['last_name2'].invalid">
+        El segundo apellido es obligatorio
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Teléfono -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Teléfono</mat-label>
+      <input matInput type="text" formControlName="phone" placeholder="Número de contacto">
+      <mat-error *ngIf="f['phone'].touched && f['phone'].invalid">
+        El teléfono debe tener entre 7 y 15 dígitos
       </mat-error>
     </mat-form-field>
 
@@ -24,12 +76,12 @@
     <!-- Contraseña -->
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Contraseña</mat-label>
-      <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" placeholder="Mínimo 6 caracteres">
+      <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" placeholder="Mínimo 8 caracteres">
       <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
         <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
       </button>
       <mat-error *ngIf="f['password'].touched && f['password'].invalid">
-        La contraseña es obligatoria y debe tener mínimo 6 caracteres
+        La contraseña debe tener mínimo 8 caracteres con mayúscula, minúscula, número y caracter especial
       </mat-error>
     </mat-form-field>
 
@@ -49,9 +101,6 @@
     <button mat-raised-button color="primary" class="full-width" type="submit" [disabled]="form.invalid">
       Registrarme
     </button>
-
-    <!-- Botón de Google -->
-    <div id="google-btn-register" style="margin-top: 20px; display:flex; justify-content:center;"></div>
 
     <!-- Enlace a login -->
     <p class="login-link">

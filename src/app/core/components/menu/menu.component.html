@@ -13,7 +13,8 @@
       </a>
     </li>
     <li>
-      <a routerLink="/team" routerLinkActive="active">
+      <!-- Ahora llamamos a openTeam() que valida con UserService -->
+      <a (click)="openTeam()">
         <mat-icon>sports_soccer</mat-icon>
         <span>Mi equipo</span>
       </a>
