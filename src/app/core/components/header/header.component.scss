@@ -1,45 +1,190 @@
+/* ==== Fuente para el título (deportiva) ==== */
+@import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
+
+/* ==== Tema Header — Split-Complementary (botones naranjas + fondo azulados) ==== */
+:root {
+  /* Acento (botones) */
+  --btn-orange-700: #ff6a00;
+  --btn-orange-600: #ff7f26;
+
+  /* Fondo header (split-complementary del naranja) */
+  --h1: #0f1524;   /* base: azul noche */
+  --h2: #1a2b57;   /* azul violáceo */
+  --h3: #0f3b4a;   /* azul verdoso */
+
+  /* Texto y detalles */
+  --header-text:  #ffffff;
+  --header-muted: #e8f0ff;
+  --ring:         rgba(255,255,255,.45);
+  --stroke:       rgba(255,255,255,.14);
+
+  /* Intensidad decorativa (radiales) */
+  --spot-1: .22;  /* baja a .14 si lo quieres más sutil */
+  --spot-2: .18;  /* baja a .12 si lo quieres más sutil */
+}
+
 .header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: linear-gradient(90deg, #1b5e20, #0d47a1);
-  color: white;
-  padding: 10px 20px;
   position: sticky;
   top: 0;
   z-index: 1000;
-  width: 100%;          // ✅ que siempre ocupe todo el ancho
-  box-sizing: border-box;
+  width: 100%;
+  color: var(--header-text);
 
-  .logo {
-    font-size: 1.4rem;
-    font-weight: bold;
-    display: flex;
+  /* Fondo con gradientes radiales (círculos) + degradado principal */
+  background:
+    radial-gradient(700px 420px at 85% -10%, rgba(47,110,191, var(--spot-1)), transparent 60%),
+    radial-gradient(520px 360px at 15% 120%, rgba(27,153,136, var(--spot-2)), transparent 62%),
+    linear-gradient(95deg, var(--h1) 0%, var(--h2) 55%, var(--h3) 120%);
+  box-shadow: 0 6px 14px rgba(0,0,0,.22);
+  border-bottom: 1px solid rgba(0,0,0,.25);
+  backdrop-filter: saturate(1.15) blur(6px);
+  -webkit-backdrop-filter: saturate(1.15) blur(6px);
+
+  /* Contenido centrado */
+  .inner {
+    display: grid;
+    grid-template-columns: auto 1fr auto; /* logo | spacer | acciones */
     align-items: center;
+    column-gap: 12px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 10px clamp(14px, 2.8vw, 24px);
+    box-sizing: border-box;
   }
 
+  /* Branding + botón hamburguesa */
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: clamp(1.05rem, 1.4vw, 1.25rem);
+    letter-spacing: .2px;
+
+    .brand {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 8px;
+      line-height: 1;
+
+      .word-a, .word-b {
+        font-family: 'Anton', sans-serif; /* <<< fuente para el título */
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 400;                 /* Anton ya es bold */
+        font-size: clamp(1.2rem, 2vw, 1.6rem);
+      }
+
+      /* “FÚTBOL” en degradado naranja */
+      .word-a {
+        background: linear-gradient(180deg, #ff8a33 0%, #ff6a00 65%, #c83b00 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        text-shadow: 0 1px 0 rgba(0,0,0,.25);
+      }
+
+      /* “FANTASY” blanco intenso */
+      .word-b {
+        color: #ffffff;
+        text-shadow: 0 1px 0 rgba(0,0,0,.25);
+      }
+
+      /* “COLOMBIA” discreto */
+      em {
+        font-style: normal;
+        font-weight: 700;
+        color: var(--header-muted);
+        opacity: .95;
+        margin-left: 6px;
+        padding-left: 8px;
+        border-left: 1px solid rgba(255,255,255,.18);
+        letter-spacing: .4px;
+      }
+    }
+
+    /* Material icon button: hamburguesa */
+    ::ng-deep .mat-mdc-icon-button {
+      color: var(--header-text);
+      border-radius: 10px;
+      transition: background .18s ease, transform .08s ease;
+    }
+    ::ng-deep .mat-mdc-icon-button:hover { background: rgba(255,255,255,.15) }
+    ::ng-deep .mat-mdc-icon-button:active { transform: scale(.96) }
+  }
+
+  /* Empuja acciones a la derecha */
+  .spacer { }
+
+  /* Botones de autenticación (sin sesión) — mantienen acento naranja */
   .auth-buttons {
-    display: flex;
-    button {
-      margin-left: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+
+    ::ng-deep .mat-mdc-raised-button.mat-primary {
+      font-weight: 700;
+      border-radius: 10px;
+      color: #121212;
+      background: linear-gradient(135deg, var(--btn-orange-600), var(--btn-orange-700));
+      box-shadow: 0 6px 14px rgba(0,0,0,.22);
+      border: 1px solid rgba(0,0,0,.25);
+      transition: transform .12s ease, filter .12s ease;
+    }
+    ::ng-deep .mat-mdc-raised-button.mat-primary:hover {
+      filter: brightness(1.05);
+      transform: translateY(-1px);
     }
   }
 
+  /* Usuario logueado */
   .user-actions {
-    display: flex;
+    display: inline-flex;
     align-items: center;
+    gap: 6px;
 
     span {
-      margin-right: 10px;
-      font-weight: bold;
+      margin-right: 6px;
+      font-weight: 600;
+      opacity: .95;
+      text-shadow: 0 1px 0 rgba(0,0,0,.15);
     }
 
     .user-avatar {
       width: 40px;
       height: 40px;
-      border-radius: 50%;   // ✅ redondear imagen
+      border-radius: 50%;
       object-fit: cover;
-      margin-left: 10px;
+      margin-left: 6px;
+      box-shadow: 0 0 0 2px var(--ring), 0 6px 12px rgba(0,0,0,.25);
     }
+
+    ::ng-deep .mat-mdc-icon-button {
+      color: var(--header-text);
+      border-radius: 10px;
+    }
+    ::ng-deep .mat-mdc-menu-content { padding: 6px 0 }
+    ::ng-deep .mat-mdc-menu-item .mat-mdc-menu-item-text { font-weight: 500 }
   }
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 860px) {
+  .header .inner {
+    grid-template-columns: auto 1fr auto;
+    padding: 9px 14px;
+  }
+}
+
+@media (max-width: 720px) {
+  .header .inner {
+    grid-template-columns: auto 1fr auto;
+    padding: 8px 12px;
+  }
+  .header .logo { font-size: 1rem; }
+  .header .brand em { display: none; }      /* opcional: oculta “COLOMBIA” en móvil */
+  .header .auth-buttons ::ng-deep .mat-mdc-raised-button {
+    min-width: auto; padding: 0 12px;
+  }
+  .header .user-actions span { display: none; } /* deja solo avatar + menú */
 }

@@ -1,29 +1,35 @@
 <header class="header">
-  <div class="logo">
-    <button mat-icon-button (click)="toggleMenu.emit()">
-      <mat-icon>menu</mat-icon>
-    </button>
-    ⚽ Fútbol Fantasy Colombia
-  </div>
-
-  <!-- 🔹 Si NO hay sesión -->
-  <div class="auth-buttons" *ngIf="!isLoggedIn()">
-    <button mat-raised-button color="primary" routerLink="/register">Registrarse</button>
-    <button mat-raised-button color="primary" routerLink="/login">Iniciar Sesión</button>
-  </div>
-
-  <!-- 🔹 Si hay sesión -->
-  <div class="user-actions" *ngIf="isLoggedIn()">
-    <span>{{ user?.name }}</span>
-    <img [src]="user?.picture" alt="Usuario" class="user-avatar" *ngIf="user?.picture" />
-    <button mat-icon-button [matMenuTriggerFor]="menu">
-      <mat-icon>arrow_drop_down</mat-icon>
-    </button>
-    <mat-menu #menu="matMenu">
-      <button mat-menu-item (click)="logout()">
-        <mat-icon>logout</mat-icon>
-        <span>Cerrar Sesión</span>
+  <div class="inner">
+    <div class="logo">
+      <button mat-icon-button aria-label="Abrir menú" (click)="toggleMenu.emit()">
+        <mat-icon>menu</mat-icon>
       </button>
-    </mat-menu>
+      <div class="brand">
+        <span class="word-a">FÚTBOL</span>
+        <span class="word-a">FANTASY</span>
+        <em>COLOMBIA</em>
+      </div>
+    </div>
+
+    <div class="spacer"></div>
+
+    <div class="auth-buttons" *ngIf="!isLoggedIn()">
+      <button mat-raised-button color="primary" routerLink="/register">Registrarse</button>
+      <button mat-raised-button color="primary" routerLink="/login">Iniciar Sesión</button>
+    </div>
+
+    <div class="user-actions" *ngIf="isLoggedIn()">
+      <span>{{ user?.name }}</span>
+      <img [src]="user?.picture" alt="Usuario" class="user-avatar" *ngIf="user?.picture" />
+      <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Opciones de usuario">
+        <mat-icon>arrow_drop_down</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          <span>Cerrar Sesión</span>
+        </button>
+      </mat-menu>
+    </div>
   </div>
 </header>

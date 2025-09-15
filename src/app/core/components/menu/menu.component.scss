@@ -1,41 +1,59 @@
 .menu {
   height: 100%;
-  background: linear-gradient(180deg, #1b5e20, #1e3a8a);
-  color: white;
+  background: linear-gradient(180deg, #ff6a00 0%, #c83b00 40%, #131a24 100%);
+  color: #ffffff;
   padding: 1rem 0;
+  display: flex;
+  flex-direction: column;
 
   ul {
     list-style: none;
     padding: 0;
     margin: 0;
+    flex: 1;
 
     li {
-      margin: 0.5rem 0;
+      margin: 0.3rem 0;
 
       a {
         display: flex;
         align-items: center;
-        padding: 0.8rem 1.5rem;
-        color: white;
+        padding: 0.9rem 1.4rem;
+        color: #fff;
         text-decoration: none;
         font-weight: 500;
-        transition: all 0.3s ease;
-        border-radius: 8px;
+        transition: all 0.25s ease;
+        border-radius: 10px;
+        position: relative;
 
         mat-icon {
-          margin-right: 10px;
+          margin-right: 12px;
+          font-size: 22px;
         }
 
         &:hover {
-          background: rgba(255, 255, 255, 0.1);
-          transform: translateX(5px);
+          background: rgba(255, 255, 255, 0.08);
+          transform: translateX(6px);
         }
 
         &.active {
-          background: rgba(255, 255, 255, 0.2);
-          font-weight: bold;
+          background: linear-gradient(135deg, #ff8a33, #ff6a00);
+          color: #121212;
+          font-weight: 600;
+          box-shadow: 0 4px 10px rgba(0,0,0,.25);
         }
       }
     }
+  }
+}
+
+/* Responsive: menú compacto en pantallas pequeñas */
+@media (max-width: 720px) {
+  .menu ul li a {
+    padding: 0.8rem 1rem;
+    font-size: 0.95rem;
+  }
+  .menu ul li a mat-icon {
+    margin-right: 8px;
   }
 }
