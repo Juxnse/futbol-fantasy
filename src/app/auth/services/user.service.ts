@@ -4,7 +4,6 @@ import {
   BehaviorSubject,
   Observable,
   tap,
-  map,
   of,
   catchError,
 } from 'rxjs';
@@ -29,28 +28,25 @@ interface AuthResponse {
 export class UserService {
   private apiUrl = 'https://football-fantasy-back.onrender.com/users';
 
-  // ⚠️ Reemplaza con tu CLIENT_ID real de Google si corresponde
-  private clientId = '41563777174-th5masuqcivb0t3eb30brqsugd1ojjrh.apps.googleusercontent.com';
+  private clientId =
+    '41563777174-th5masuqcivb0t3eb30brqsugd1ojjrh.apps.googleusercontent.com';
 
   private googleReady: Promise<void>;
   private googleReadyResolver!: () => void;
 
-  // ===== Estado reactivo =====
   private userSubject = new BehaviorSubject<User | null>(null);
   private tokenSubject = new BehaviorSubject<string | null>(null);
 
-  /** Observables públicos */
   readonly user$ = this.userSubject.asObservable();
   readonly token$ = this.tokenSubject.asObservable();
 
   constructor(private http: HttpClient) {
-    // Inicializa Google
     this.googleReady = new Promise<void>((resolve) => {
       this.googleReadyResolver = resolve;
     });
     this.waitForGoogle();
 
-    // Sincroniza con localStorage al iniciar
+    // 🔹 Sincroniza con localStorage
     const token = localStorage.getItem('token');
     const userRaw = localStorage.getItem('user');
     const user = userRaw ? (JSON.parse(userRaw) as User) : null;
@@ -59,7 +55,7 @@ export class UserService {
   }
 
   // ===========================
-  // Token + Headers
+  // Token
   // ===========================
   private setToken(token: string | null): void {
     if (token) {
@@ -82,25 +78,36 @@ export class UserService {
   }
 
   // ===========================
-  // User helpers (estado)
+  // User helpers
   // ===========================
   private setUser(user: User | null): void {
-    if (user) localStorage.setItem('user', JSON.stringify(user));
-    else localStorage.removeItem('user');
+    if (user) {
+      localStorage.setItem('user', JSON.stringify(user));
+
+      // 🔹 Compatibilidad con torneos
+      localStorage.setItem('ff_user', JSON.stringify(user));
+      localStorage.setItem('ff_logged_in', 'true');
+    } else {
+      localStorage.removeItem('user');
+
+      // 🔹 Limpieza para torneos
+      localStorage.removeItem('ff_user');
+      localStorage.removeItem('ff_logged_in');
+    }
+
     this.userSubject.next(user);
   }
 
-  /** Sincrónico: útil para plantillas o guards */
   getUser(): User | null {
     return this.userSubject.value;
   }
 
   isLoggedIn(): boolean {
-    return !!this.getToken();
+    return !!this.getToken() || !!localStorage.getItem('ff_logged_in');
   }
 
   // ===========================
-  // Users CRUD (protegidos)
+  // Users CRUD
   // ===========================
   getUsers(): Observable<User[]> {
     return this.http.get<User[]>(`${this.apiUrl}/`, {
@@ -125,42 +132,38 @@ export class UserService {
   }
 
   // ===========================
-  // Auth (backend)
+  // Auth
   // ===========================
   loginUser(credentials: { email: string; password: string }): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
-      tap((response) => {
-        if (response.access_token) this.setToken(response.access_token);
-        if (response.user) this.setUser({ ...response.user, provider: 'local' });
-      })
-    );
+    return this.http
+      .post<AuthResponse>(`${this.apiUrl}/login`, credentials)
+      .pipe(
+        tap((response) => {
+          if (response.access_token) this.setToken(response.access_token);
+          if (response.user) this.setUser({ ...response.user, provider: 'local' });
+        })
+      );
   }
 
-  /** Recupera usuario autenticado desde el backend */
   getLoggedUser(): Observable<User | null> {
-    return this.http.get<User>(`${this.apiUrl}/me`, {
-      headers: this.getAuthHeaders(),
-    }).pipe(
-      tap((u) => this.setUser(u)),
-      catchError(() => {
-        // Si falla (token inválido), limpia sesión
-        this.logoutUser();
-        return of(null);
-      })
-    );
+    return this.http
+      .get<User>(`${this.apiUrl}/me`, { headers: this.getAuthHeaders() })
+      .pipe(
+        tap((u) => this.setUser(u)),
+        catchError(() => {
+          this.logoutUser();
+          return of(null);
+        })
+      );
   }
 
   logoutUser(): void {
     this.setToken(null);
     this.setUser(null);
-  }
 
-  // ===========================
-  // Helpers para UI
-  // ===========================
-  /** Alias del localStorage anterior, mantenido por compatibilidad */
-  getUserFromLocal(): User | null {
-    return this.getUser();
+    // 🔹 Extra por seguridad
+    localStorage.removeItem('ff_user');
+    localStorage.removeItem('ff_logged_in');
   }
 
   // ===========================
@@ -203,12 +206,9 @@ export class UserService {
     });
   }
 
-  /** Maneja el credential de Google One Tap / botón */
   private handleGoogleCredential(resp: { credential: string }) {
     const payload = this.parseJwt(resp.credential);
 
-    // ⚠️ OPCIÓN RÁPIDA (actual): usamos el ID token de Google como token de sesión local
-    // Recomendado: intercambiar en tu backend: POST /auth/google { id_token } -> access_token propio
     const user: User = {
       name: payload.name,
       email: payload.email,
@@ -219,12 +219,8 @@ export class UserService {
     this.setUser(user);
     this.setToken(resp.credential);
 
-    // Notificar a la app que el login Google fue exitoso
     const event = new CustomEvent('googleLoginSuccess');
     window.dispatchEvent(event);
-
-    // Si quieres forzar sync con backend luego:
-    // this.getLoggedUser().subscribe();
   }
 
   private parseJwt(token: string): any {
@@ -233,7 +229,10 @@ export class UserService {
     const jsonPayload = decodeURIComponent(
       atob(base64)
         .split('')
-        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .map(
+          (c) =>
+            '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+        )
         .join('')
     );
     return JSON.parse(jsonPayload);

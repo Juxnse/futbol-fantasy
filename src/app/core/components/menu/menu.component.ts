@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
-import { UserService } from 'src/app/services/user.service';
+import { UserService } from 'src/app/auth/services/user.service';
 
 @Component({
   selector: 'app-menu',
@@ -29,7 +29,7 @@ export class MenuComponent {
       confirmButtonText: 'Ir a iniciar sesión',
       showCancelButton: true,
       cancelButtonText: 'Cancelar',
-    }).then(res => {
+    }).then((res) => {
       if (res.isConfirmed) {
         this.router.navigate(['/login']);
         this.close.emit();

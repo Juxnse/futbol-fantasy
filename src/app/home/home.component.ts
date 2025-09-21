@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject, map, takeUntil } from 'rxjs';
-import { UserService } from 'src/app/services/user.service';
+import { UserService } from 'src/app/auth/services/user.service';
 import { SquadStateService } from 'src/app/features/equipos/services/squad-state.service'; // 👈 nuevo
 import Swal from 'sweetalert2';
 

@@ -1,7 +1,7 @@
 import { Component, AfterViewInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { UserService } from 'src/app/services/user.service';
+import { UserService } from 'src/app/auth/services/user.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -30,12 +30,12 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
     return this.form.controls;
   }
 
-  /** Login normal */
+  /** Login normal con backend/localStorage */
   submit() {
     if (this.form.valid) {
       const { email, password } = this.form.value;
       this.userService.loginUser({ email, password }).subscribe({
-        next: () => {
+        next: (resp) => {
           Swal.fire({
             icon: 'success',
             title: '✅ Sesión iniciada correctamente',
@@ -57,20 +57,31 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  /** Renderizar el botón de Google cuando el componente carga */
+  /** Renderizar el botón de Google al cargar el componente */
   ngAfterViewInit(): void {
     this.userService.initGoogle();
     this.userService.renderGoogleButton('google-btn');
     window.addEventListener('googleLoginSuccess', this.googleLoginHandler);
   }
 
-  /** Limpiar el listener cuando se destruya el componente */
+  /** Limpiar listener al destruir el componente */
   ngOnDestroy(): void {
     window.removeEventListener('googleLoginSuccess', this.googleLoginHandler);
   }
 
-  /** Se llama cuando el login con Google es correcto */
+  /** Cuando Google login fue exitoso */
   onGoogleLoginSuccess() {
+    const googleUser = this.userService.getUser(); // ✅ ya lo tenemos desde UserService.setUser()
+
+    if (!googleUser) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error con Google Login',
+        text: 'No se pudo obtener la información del usuario',
+      });
+      return;
+    }
+
     Swal.fire({
       icon: 'success',
       title: '✅ Sesión iniciada con Google',

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
-import { UserService } from 'src/app/services/user.service';
+import { UserService } from 'src/app/auth/services/user.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -27,7 +27,7 @@ export class RegisterComponent {
       last_name2: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email, this.validDomain]],
       phone: ['', [Validators.required, Validators.pattern(/^[0-9]{7,15}$/)]],
-      role: ['user'], // ⚡ por defecto user
+      role: ['user'], 
       password: ['', [
         Validators.required,
         Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%?&])[A-Za-z\d@$!%?&]{8,}$/)
