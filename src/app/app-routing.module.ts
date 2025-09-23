@@ -26,6 +26,14 @@ const routes: Routes = [
     title: 'Torneos · Fútbol Fantasy',
   },
 
+  {
+  path: 'perfil',
+  loadChildren: () =>
+    import('./features/perfil/perfil.module').then(m => m.PerfilModule),
+  title: 'Mi perfil · Fútbol Fantasy',
+  },
+
+
   { path: '', redirectTo: '/home', pathMatch: 'full' },
   { path: '**', redirectTo: '/home' },
 ];

@@ -35,10 +35,15 @@
     </li>
 
     <li>
-      <a routerLink="/profile" routerLinkActive="active">
-        <mat-icon>person</mat-icon>
-        <span>Perfil</span>
-      </a>
-    </li>
+  <a
+    routerLink="/perfil"
+    routerLinkActive="active"
+    [routerLinkActiveOptions]="{ exact: true }"
+    (click)="openProfile($event)"
+  >
+    <mat-icon>person</mat-icon>
+    <span>Perfil</span>
+  </a>
+  </li>
   </ul>
 </nav>

@@ -1,0 +1,37 @@
+<mat-card class="perfil">
+  <h1>Mi perfil</h1>
+
+  <div class="avatar">
+    <img [src]="avatarPreview || 'assets/avatar-placeholder.png'" alt="Avatar" />
+    <div class="buttons">
+      <button mat-stroked-button (click)="onPickAvatar(file)" matTooltip="Cambiar foto">
+        <mat-icon>photo_camera</mat-icon> Cambiar foto
+      </button>
+      <input #file type="file" accept="image/*" (change)="onAvatarSelected($event)" hidden />
+    </div>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="save()" class="form">
+    <mat-form-field appearance="outline" class="full">
+      <mat-label>Nombre</mat-label>
+      <input matInput formControlName="name" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full">
+      <mat-label>Email</mat-label>
+      <input matInput formControlName="email" />
+      <mat-hint *ngIf="isGoogle">El email proviene de Google</mat-hint>
+    </mat-form-field>
+
+    <!-- Si más adelante quieres permitir "equipo favorito", "ciudad", etc., añádelos aquí -->
+
+    <div class="actions">
+      <button mat-stroked-button type="button" routerLink="/home">Cancelar</button>
+      <button mat-raised-button color="primary" [disabled]="loading" type="submit">
+        <mat-icon *ngIf="!loading">save</mat-icon>
+        <span *ngIf="!loading">Guardar</span>
+        <span *ngIf="loading">Guardando…</span>
+      </button>
+    </div>
+  </form>
+</mat-card>

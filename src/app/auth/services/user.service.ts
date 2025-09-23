@@ -58,11 +58,8 @@ export class UserService {
   // Token
   // ===========================
   private setToken(token: string | null): void {
-    if (token) {
-      localStorage.setItem('token', token);
-    } else {
-      localStorage.removeItem('token');
-    }
+    if (token) localStorage.setItem('token', token);
+    else localStorage.removeItem('token');
     this.tokenSubject.next(token);
   }
 
@@ -83,23 +80,27 @@ export class UserService {
   private setUser(user: User | null): void {
     if (user) {
       localStorage.setItem('user', JSON.stringify(user));
-
       // 🔹 Compatibilidad con torneos
       localStorage.setItem('ff_user', JSON.stringify(user));
       localStorage.setItem('ff_logged_in', 'true');
     } else {
       localStorage.removeItem('user');
-
       // 🔹 Limpieza para torneos
       localStorage.removeItem('ff_user');
       localStorage.removeItem('ff_logged_in');
     }
-
     this.userSubject.next(user);
   }
 
   getUser(): User | null {
     return this.userSubject.value;
+  }
+
+  /** ✅ Actualiza el usuario en memoria + localStorage (para Perfil) */
+  applyUserPatch(patch: Partial<User>) {
+    const current = this.getUser() ?? ({} as User);
+    const merged = { ...current, ...patch };
+    this.setUser(merged);
   }
 
   isLoggedIn(): boolean {
@@ -125,10 +126,26 @@ export class UserService {
     });
   }
 
+  /** 🔄 Actualiza por ID y sincroniza el estado local */
   updateUser(userId: string, data: Partial<User>): Observable<User> {
     return this.http.put<User>(`${this.apiUrl}/${userId}`, data, {
       headers: this.getAuthHeaders(),
-    });
+    })
+    .pipe(tap(u => this.setUser({ ...(this.getUser() ?? {}), ...u } as User)));
+  }
+
+  /** 🔄 PUT /users/me (si tu backend lo soporta). Hace fallback local si falla. */
+  updateMe(data: Partial<User>): Observable<User> {
+    return this.http.put<User>(`${this.apiUrl}/me`, data, {
+      headers: this.getAuthHeaders(),
+    }).pipe(
+      tap(u => this.setUser({ ...(this.getUser() ?? {}), ...u } as User)),
+      catchError(() => {
+        // si no existe el endpoint, al menos actualiza localmente
+        this.applyUserPatch(data);
+        return of(this.getUser() as User);
+      })
+    );
   }
 
   // ===========================
@@ -145,13 +162,20 @@ export class UserService {
       );
   }
 
-  getLoggedUser(): Observable<User | null> {
+  // UserService
+  getLoggedUser(opts: { soft?: boolean } = {}): Observable<User | null> {
     return this.http
       .get<User>(`${this.apiUrl}/me`, { headers: this.getAuthHeaders() })
       .pipe(
-        tap((u) => this.setUser(u)),
-        catchError(() => {
-          this.logoutUser();
+        tap(u => this.setUser({ ...(this.getUser() ?? {}), ...u } as User)),
+        catchError(err => {
+          // Si estamos en modo "soft", NO hagas logout (útil para login Google o si el backend no reconoce el token)
+          if (!opts.soft) {
+            // solo cierra sesión si de verdad quieres comportamiento estricto
+            if (err?.status === 401 && (this.getUser()?.provider === 'local')) {
+              this.logoutUser();
+            }
+          }
           return of(null);
         })
       );
@@ -160,7 +184,6 @@ export class UserService {
   logoutUser(): void {
     this.setToken(null);
     this.setUser(null);
-
     // 🔹 Extra por seguridad
     localStorage.removeItem('ff_user');
     localStorage.removeItem('ff_logged_in');
@@ -229,10 +252,7 @@ export class UserService {
     const jsonPayload = decodeURIComponent(
       atob(base64)
         .split('')
-        .map(
-          (c) =>
-            '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-        )
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
         .join('')
     );
     return JSON.parse(jsonPayload);
