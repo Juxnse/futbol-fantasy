@@ -14,7 +14,7 @@ export class SquadStateService {
 
   setFormation(id: string) {
     localStorage.setItem(this.KEY, id);
-    this.formationSubject.next(id);
+    this.formationSubject.next(id); // ✅ notifica en vivo
   }
 
   getFormation(): string {

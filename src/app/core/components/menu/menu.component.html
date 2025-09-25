@@ -26,5 +26,24 @@
         <span>Mi equipo</span>
       </a>
     </li>
+
+    <li>
+      <a routerLink="/tournaments" routerLinkActive="active">
+        <mat-icon>emoji_events</mat-icon>
+        <span>Torneos</span>
+      </a>
+    </li>
+
+    <li>
+  <a
+    routerLink="/perfil"
+    routerLinkActive="active"
+    [routerLinkActiveOptions]="{ exact: true }"
+    (click)="openProfile($event)"
+  >
+    <mat-icon>person</mat-icon>
+    <span>Perfil</span>
+  </a>
+  </li>
   </ul>
 </nav>

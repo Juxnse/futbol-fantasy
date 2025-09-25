@@ -1,0 +1,78 @@
+<div class="tournaments">
+  <h2>🏆 Torneos Disponibles</h2>
+
+  <!-- Botón Crear -->
+  <button mat-raised-button color="primary" (click)="openCreateDialog()">
+    ➕ Crear Torneo
+  </button>
+
+  <!-- Toggle de vista -->
+  <mat-chip-set class="view-toggle">
+    <mat-chip
+      selectable="false"
+      [class.active]="viewMode === 'grid'"
+      (click)="setView('grid')"
+    >
+      🟦 Grid
+    </mat-chip>
+    <mat-chip
+      selectable="false"
+      [class.active]="viewMode === 'list'"
+      (click)="setView('list')"
+    >
+      📋 Lista
+    </mat-chip>
+  </mat-chip-set>
+
+  <!-- Loading -->
+  <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+
+  <!-- Lista de torneos -->
+  <div
+    class="cards"
+    [ngClass]="viewMode"
+    *ngIf="tournaments$ | async as tournaments; else empty"
+  >
+    <mat-card *ngFor="let t of tournaments" class="tournament-card">
+      <mat-card-header>
+        <mat-card-title>{{ t.name }}</mat-card-title>
+        <mat-card-subtitle>
+          {{ t.visibility === 'PUBLIC' ? 'Público' : 'Privado' }}
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <p><strong>Equipos:</strong> {{ t.currentTeams }} / {{ t.maxTeams }}</p>
+        <p><strong>Fechas:</strong> {{ t.startAt }} → {{ t.endAt }}</p>
+
+        <!-- 🔹 Miembros inscritos -->
+        <div class="members-chips">
+          <mat-chip
+            *ngFor="let m of getMembers(t.id)"
+            [ngClass]="m.role === 'OWNER' ? 'owner-chip' : 'member-chip'"
+          >
+            {{ m.userName }} <span *ngIf="m.role === 'OWNER'">⭐</span>
+          </mat-chip>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions>
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="joinTournament(t.id)"
+          [disabled]="isMember(t.id)"
+        >
+          {{ isMember(t.id) ? 'Ya inscrito' : 'Unirse' }}
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <!-- Estado vacío -->
+  <ng-template #empty>
+    <p style="margin-top: 16px; text-align: center;">
+      No hay torneos disponibles.
+    </p>
+  </ng-template>
+</div>

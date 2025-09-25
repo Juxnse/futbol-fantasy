@@ -18,15 +18,31 @@ const routes: Routes = [
     title: 'Equipos · Fútbol Fantasy',
   },
 
+  // Lazy load del feature "tournaments"
+  {
+    path: 'tournaments',
+    loadChildren: () =>
+      import('./features/tournaments/tournaments.module').then(m => m.TournamentsModule),
+    title: 'Torneos · Fútbol Fantasy',
+  },
+
+  {
+  path: 'perfil',
+  loadChildren: () =>
+    import('./features/perfil/perfil.module').then(m => m.PerfilModule),
+  title: 'Mi perfil · Fútbol Fantasy',
+  },
+
+
   { path: '', redirectTo: '/home', pathMatch: 'full' },
   { path: '**', redirectTo: '/home' },
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes, {
-    preloadingStrategy: PreloadAllModules,   // precarga módulos en idle
-    scrollPositionRestoration: 'enabled',    // vuelve al tope / restaura en back
-    anchorScrolling: 'enabled',              // permite #anclas
+    preloadingStrategy: PreloadAllModules,   // precarga módulos cuando el navegador está idle
+    scrollPositionRestoration: 'enabled',    // vuelve al tope / restaura al hacer back
+    anchorScrolling: 'enabled',              // permite navegar a #anclas
   })],
   exports: [RouterModule],
 })

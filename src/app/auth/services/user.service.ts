@@ -1,56 +1,55 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import {
-  BehaviorSubject,
-  Observable,
-  tap,
-  map,
-  of,
-  catchError,
-} from 'rxjs';
+import { BehaviorSubject, Observable, tap, of, catchError } from 'rxjs';
 
 declare const google: any;
 
 export interface User {
-  id?: string;
+  id?: string;                 // backend local
+  sub: string;                 // Google o fallback
   name: string;
   email: string;
   picture?: string;
-  provider?: 'local' | 'google';
-  [k: string]: any;
+  provider: 'local' | 'google';
+
+  // 🔹 Campos adicionales para registro
+  document?: string;
+  document_type?: string;
+  last_name1?: string;
+  last_name2?: string;
+  phone?: string;
+  role?: string;
+  password?: string;
+  re_password?: string;
 }
 
 interface AuthResponse {
   access_token?: string;
-  user?: User;
+  user?: Partial<User>;
 }
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
   private apiUrl = 'https://football-fantasy-back.onrender.com/users';
 
-  // ⚠️ Reemplaza con tu CLIENT_ID real de Google si corresponde
-  private clientId = '41563777174-th5masuqcivb0t3eb30brqsugd1ojjrh.apps.googleusercontent.com';
+  private clientId =
+    '41563777174-th5masuqcivb0t3eb30brqsugd1ojjrh.apps.googleusercontent.com';
 
   private googleReady: Promise<void>;
   private googleReadyResolver!: () => void;
 
-  // ===== Estado reactivo =====
   private userSubject = new BehaviorSubject<User | null>(null);
   private tokenSubject = new BehaviorSubject<string | null>(null);
 
-  /** Observables públicos */
   readonly user$ = this.userSubject.asObservable();
   readonly token$ = this.tokenSubject.asObservable();
 
   constructor(private http: HttpClient) {
-    // Inicializa Google
     this.googleReady = new Promise<void>((resolve) => {
       this.googleReadyResolver = resolve;
     });
     this.waitForGoogle();
 
-    // Sincroniza con localStorage al iniciar
     const token = localStorage.getItem('token');
     const userRaw = localStorage.getItem('user');
     const user = userRaw ? (JSON.parse(userRaw) as User) : null;
@@ -59,14 +58,11 @@ export class UserService {
   }
 
   // ===========================
-  // Token + Headers
+  // Token
   // ===========================
   private setToken(token: string | null): void {
-    if (token) {
-      localStorage.setItem('token', token);
-    } else {
-      localStorage.removeItem('token');
-    }
+    if (token) localStorage.setItem('token', token);
+    else localStorage.removeItem('token');
     this.tokenSubject.next(token);
   }
 
@@ -82,25 +78,37 @@ export class UserService {
   }
 
   // ===========================
-  // User helpers (estado)
+  // User helpers
   // ===========================
   private setUser(user: User | null): void {
-    if (user) localStorage.setItem('user', JSON.stringify(user));
-    else localStorage.removeItem('user');
+    if (user) {
+      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('ff_user', JSON.stringify(user));
+      localStorage.setItem('ff_logged_in', 'true');
+    } else {
+      localStorage.removeItem('user');
+      localStorage.removeItem('ff_user');
+      localStorage.removeItem('ff_logged_in');
+    }
     this.userSubject.next(user);
   }
 
-  /** Sincrónico: útil para plantillas o guards */
   getUser(): User | null {
     return this.userSubject.value;
   }
 
+  applyUserPatch(patch: Partial<User>) {
+    const current = this.getUser() ?? ({} as User);
+    const merged = { ...current, ...patch };
+    this.setUser(merged as User);
+  }
+
   isLoggedIn(): boolean {
-    return !!this.getToken();
+    return !!this.getToken() || !!localStorage.getItem('ff_logged_in');
   }
 
   // ===========================
-  // Users CRUD (protegidos)
+  // Users CRUD
   // ===========================
   getUsers(): Observable<User[]> {
     return this.http.get<User[]>(`${this.apiUrl}/`, {
@@ -119,48 +127,78 @@ export class UserService {
   }
 
   updateUser(userId: string, data: Partial<User>): Observable<User> {
-    return this.http.put<User>(`${this.apiUrl}/${userId}`, data, {
-      headers: this.getAuthHeaders(),
-    });
+    return this.http
+      .put<User>(`${this.apiUrl}/${userId}`, data, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(
+        tap((u) =>
+          this.setUser({ ...(this.getUser() ?? {}), ...u } as User)
+        )
+      );
+  }
+
+  updateMe(data: Partial<User>): Observable<User> {
+    return this.http
+      .put<User>(`${this.apiUrl}/me`, data, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(
+        tap((u) =>
+          this.setUser({ ...(this.getUser() ?? {}), ...u } as User)
+        ),
+        catchError(() => {
+          this.applyUserPatch(data);
+          return of(this.getUser() as User);
+        })
+      );
   }
 
   // ===========================
-  // Auth (backend)
+  // Auth
   // ===========================
   loginUser(credentials: { email: string; password: string }): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
-      tap((response) => {
-        if (response.access_token) this.setToken(response.access_token);
-        if (response.user) this.setUser({ ...response.user, provider: 'local' });
-      })
-    );
+    return this.http
+      .post<AuthResponse>(`${this.apiUrl}/login`, credentials)
+      .pipe(
+        tap((response) => {
+          if (response.access_token) this.setToken(response.access_token);
+          if (response.user) {
+            this.setUser({
+              id: response.user['id'] as string,
+              sub: (response.user['id'] as string) || response.user.email!,
+              name: response.user.name!,
+              email: response.user.email!,
+              provider: 'local',
+            });
+          }
+        })
+      );
   }
 
-  /** Recupera usuario autenticado desde el backend */
-  getLoggedUser(): Observable<User | null> {
-    return this.http.get<User>(`${this.apiUrl}/me`, {
-      headers: this.getAuthHeaders(),
-    }).pipe(
-      tap((u) => this.setUser(u)),
-      catchError(() => {
-        // Si falla (token inválido), limpia sesión
-        this.logoutUser();
-        return of(null);
-      })
-    );
+  getLoggedUser(opts: { soft?: boolean } = {}): Observable<User | null> {
+    return this.http
+      .get<User>(`${this.apiUrl}/me`, { headers: this.getAuthHeaders() })
+      .pipe(
+        tap((u) =>
+          this.setUser({ ...(this.getUser() ?? {}), ...u } as User)
+        ),
+        catchError((err) => {
+          if (!opts.soft) {
+            if (err?.status === 401 && this.getUser()?.provider === 'local') {
+              this.logoutUser();
+            }
+          }
+          return of(null);
+        })
+      );
   }
 
   logoutUser(): void {
     this.setToken(null);
     this.setUser(null);
-  }
-
-  // ===========================
-  // Helpers para UI
-  // ===========================
-  /** Alias del localStorage anterior, mantenido por compatibilidad */
-  getUserFromLocal(): User | null {
-    return this.getUser();
+    localStorage.removeItem('ff_user');
+    localStorage.removeItem('ff_logged_in');
   }
 
   // ===========================
@@ -203,13 +241,11 @@ export class UserService {
     });
   }
 
-  /** Maneja el credential de Google One Tap / botón */
   private handleGoogleCredential(resp: { credential: string }) {
     const payload = this.parseJwt(resp.credential);
 
-    // ⚠️ OPCIÓN RÁPIDA (actual): usamos el ID token de Google como token de sesión local
-    // Recomendado: intercambiar en tu backend: POST /auth/google { id_token } -> access_token propio
     const user: User = {
+      sub: payload.sub || payload.email,
       name: payload.name,
       email: payload.email,
       picture: payload.picture,
@@ -219,12 +255,8 @@ export class UserService {
     this.setUser(user);
     this.setToken(resp.credential);
 
-    // Notificar a la app que el login Google fue exitoso
     const event = new CustomEvent('googleLoginSuccess');
     window.dispatchEvent(event);
-
-    // Si quieres forzar sync con backend luego:
-    // this.getLoggedUser().subscribe();
   }
 
   private parseJwt(token: string): any {

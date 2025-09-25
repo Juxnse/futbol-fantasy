@@ -1,0 +1,116 @@
+/* ===== Perfil (estilo consistente con el header/tema) ===== */
+:root{
+  --btn-orange-700:#ff6a00;
+  --btn-orange-600:#ff7f26;
+  --ink:#0e1320;         /* texto oscuro en superficies claras */
+  --muted:#6b7280;       /* texto secundario */
+  --ring:rgba(0,0,0,.08);
+}
+
+/* Card principal */
+.perfil {
+  max-width: 780px;
+  margin: clamp(12px, 3vw, 28px) auto;
+  padding: clamp(12px, 2.2vw, 22px);
+  border-radius: 16px;
+  background:
+    radial-gradient(520px 280px at 90% -20%, rgba(47,110,191,.08), transparent 60%),
+    radial-gradient(420px 260px at 10% 120%, rgba(27,153,136,.08), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,255,255,.94));
+  box-shadow: 0 18px 42px rgba(0,0,0,.12), inset 0 0 0 1px rgba(0,0,0,.05);
+
+  h1{
+    margin: 0 0 6px;
+    font-size: clamp(20px, 2.4vw, 26px);
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -.2px;
+  }
+
+  .hint{ color: var(--muted); font-size: .95rem; margin: 0 0 10px }
+}
+
+/* Avatar + acciones */
+.avatar{
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 8px 0 16px;
+
+  img{
+    width: 92px; height: 92px; border-radius: 50%;
+    object-fit: cover; flex: 0 0 92px;
+    box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--ring), 0 16px 28px rgba(0,0,0,.16);
+  }
+
+  .buttons{
+    display: flex; flex-wrap: wrap; gap: 10px;
+  }
+
+  /* Botón “Cambiar foto” */
+  ::ng-deep .mat-mdc-stroked-button{
+    border-radius: 12px;
+  }
+}
+
+/* Formulario */
+.form{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+
+  .full { width: 100%; }
+
+  /* Material form-field más compacto y elegante */
+  ::ng-deep .mat-mdc-form-field{
+    width: 100%;
+  }
+  ::ng-deep .mdc-text-field{
+    border-radius: 12px !important;
+    background: #fff;
+  }
+  /* Email deshabilitado más “apagado” */
+  ::ng-deep .mdc-text-field--disabled{
+    background: #f5f6f8 !important;
+    .mdc-text-field__input{ color: #9aa3af !important; }
+  }
+}
+
+/* Acciones */
+.actions{
+  margin-top: 6px;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+
+  /* Guardar (naranja degradado) */
+  ::ng-deep .mat-mdc-raised-button.mat-primary{
+    border-radius: 12px;
+    color: #121212;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--btn-orange-600), var(--btn-orange-700));
+    box-shadow: 0 8px 18px rgba(0,0,0,.18);
+    transition: transform .12s ease, filter .12s ease;
+  }
+  ::ng-deep .mat-mdc-raised-button.mat-primary:hover{
+    transform: translateY(-1px);
+    filter: brightness(1.04);
+  }
+
+  /* Cancelar */
+  ::ng-deep .mat-mdc-stroked-button{
+    border-radius: 12px;
+    color: #0f1524;
+    border-color: rgba(0,0,0,.12);
+    background: rgba(255,255,255,.85);
+  }
+}
+
+/* Pequeños ajustes responsivos */
+@media (max-width: 640px){
+  .avatar{
+    align-items: flex-start;
+    img{ width: 84px; height: 84px; flex-basis: 84px; }
+  }
+}

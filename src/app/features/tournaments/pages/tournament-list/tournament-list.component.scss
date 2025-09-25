@@ -1,0 +1,169 @@
+:root {
+  --btn-orange-700: #ff6a00;
+  --btn-orange-600: #ff7f26;
+  --header-text: #fff;
+  --header-muted: #e8f0ff;
+}
+
+.tournaments {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: clamp(16px, 2.5vw, 28px);
+
+  h2 {
+    font-weight: 800;
+    font-size: clamp(20px, 3vw, 28px);
+    margin-bottom: 18px;
+    color: var(--header-text);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  }
+
+  .view-toggle {
+    margin: 12px 0 20px;
+    display: flex;
+    gap: 8px;
+
+    ::ng-deep .mat-mdc-chip {
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--header-text);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    ::ng-deep .mat-mdc-chip.active {
+      background: linear-gradient(
+        135deg,
+        var(--btn-orange-600),
+        var(--btn-orange-700)
+      );
+      color: #121212;
+    }
+  }
+
+  .cards {
+    display: grid;
+    gap: 18px;
+    transition: all 0.3s ease;
+
+    &.grid {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+
+    &.list {
+      grid-template-columns: 1fr;
+
+      .tournament-card {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 20px;
+
+        mat-card-header {
+          flex: 1;
+          margin: 0;
+        }
+
+        mat-card-content {
+          flex: 1;
+          margin: 0 16px;
+        }
+
+        mat-card-actions {
+          flex: 0;
+          margin: 0;
+        }
+      }
+    }
+  }
+
+  .tournament-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 14px;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.22);
+    color: var(--header-text);
+
+    ::ng-deep .mat-mdc-card-title {
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--header-text);
+    }
+
+    ::ng-deep .mat-mdc-card-subtitle {
+      color: var(--header-muted);
+      font-size: 14px;
+    }
+
+    ::ng-deep .mat-mdc-card-content p {
+      margin: 4px 0;
+      font-size: 14px;
+      color: var(--header-text);
+    }
+
+    ::ng-deep .mat-mdc-card-actions {
+      padding: 8px 16px 12px;
+    }
+
+    button[mat-raised-button] {
+      font-weight: 700;
+      border-radius: 8px;
+      background: linear-gradient(
+        135deg,
+        var(--btn-orange-600),
+        var(--btn-orange-700)
+      );
+      color: #121212;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.22);
+
+      &:hover {
+        filter: brightness(1.05);
+        transform: translateY(-1px);
+      }
+
+      &:disabled {
+        background: #666;
+        color: #ddd;
+        box-shadow: none;
+      }
+    }
+
+    /* 🔹 Chips de miembros */
+    .members-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+
+      ::ng-deep .mat-mdc-chip {
+        font-size: 12px;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-weight: 600;
+        color: #fff;
+      }
+
+      .owner-chip {
+        background: linear-gradient(135deg, #ffd700, #ffb400); /* dorado */
+        color: #000;
+      }
+
+      .member-chip {
+        background: linear-gradient(135deg, #2196f3, #1976d2); /* azul */
+      }
+    }
+  }
+}
+
+/* Progress bar degradado naranja */
+::ng-deep .mat-mdc-progress-bar {
+  --mdc-linear-progress-active-indicator-color: linear-gradient(
+    90deg,
+    var(--btn-orange-600),
+    var(--btn-orange-700)
+  );
+  height: 6px;
+  border-radius: 4px;
+  overflow: hidden;
+}
