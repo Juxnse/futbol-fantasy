@@ -44,6 +44,16 @@
       <mat-card-content>
         <p><strong>Equipos:</strong> {{ t.currentTeams }} / {{ t.maxTeams }}</p>
         <p><strong>Fechas:</strong> {{ t.startAt }} → {{ t.endAt }}</p>
+
+        <!-- 🔹 Miembros inscritos -->
+        <div class="members-chips">
+          <mat-chip
+            *ngFor="let m of getMembers(t.id)"
+            [ngClass]="m.role === 'OWNER' ? 'owner-chip' : 'member-chip'"
+          >
+            {{ m.userName }} <span *ngIf="m.role === 'OWNER'">⭐</span>
+          </mat-chip>
+        </div>
       </mat-card-content>
 
       <mat-card-actions>

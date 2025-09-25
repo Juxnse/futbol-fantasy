@@ -1,27 +1,31 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import {
-  BehaviorSubject,
-  Observable,
-  tap,
-  of,
-  catchError,
-} from 'rxjs';
+import { BehaviorSubject, Observable, tap, of, catchError } from 'rxjs';
 
 declare const google: any;
 
 export interface User {
-  id?: string;
+  id?: string;                 // backend local
+  sub: string;                 // Google o fallback
   name: string;
   email: string;
   picture?: string;
-  provider?: 'local' | 'google';
-  [k: string]: any;
+  provider: 'local' | 'google';
+
+  // 🔹 Campos adicionales para registro
+  document?: string;
+  document_type?: string;
+  last_name1?: string;
+  last_name2?: string;
+  phone?: string;
+  role?: string;
+  password?: string;
+  re_password?: string;
 }
 
 interface AuthResponse {
   access_token?: string;
-  user?: User;
+  user?: Partial<User>;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -46,7 +50,6 @@ export class UserService {
     });
     this.waitForGoogle();
 
-    // 🔹 Sincroniza con localStorage
     const token = localStorage.getItem('token');
     const userRaw = localStorage.getItem('user');
     const user = userRaw ? (JSON.parse(userRaw) as User) : null;
@@ -80,12 +83,10 @@ export class UserService {
   private setUser(user: User | null): void {
     if (user) {
       localStorage.setItem('user', JSON.stringify(user));
-      // 🔹 Compatibilidad con torneos
       localStorage.setItem('ff_user', JSON.stringify(user));
       localStorage.setItem('ff_logged_in', 'true');
     } else {
       localStorage.removeItem('user');
-      // 🔹 Limpieza para torneos
       localStorage.removeItem('ff_user');
       localStorage.removeItem('ff_logged_in');
     }
@@ -96,11 +97,10 @@ export class UserService {
     return this.userSubject.value;
   }
 
-  /** ✅ Actualiza el usuario en memoria + localStorage (para Perfil) */
   applyUserPatch(patch: Partial<User>) {
     const current = this.getUser() ?? ({} as User);
     const merged = { ...current, ...patch };
-    this.setUser(merged);
+    this.setUser(merged as User);
   }
 
   isLoggedIn(): boolean {
@@ -126,26 +126,32 @@ export class UserService {
     });
   }
 
-  /** 🔄 Actualiza por ID y sincroniza el estado local */
   updateUser(userId: string, data: Partial<User>): Observable<User> {
-    return this.http.put<User>(`${this.apiUrl}/${userId}`, data, {
-      headers: this.getAuthHeaders(),
-    })
-    .pipe(tap(u => this.setUser({ ...(this.getUser() ?? {}), ...u } as User)));
+    return this.http
+      .put<User>(`${this.apiUrl}/${userId}`, data, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(
+        tap((u) =>
+          this.setUser({ ...(this.getUser() ?? {}), ...u } as User)
+        )
+      );
   }
 
-  /** 🔄 PUT /users/me (si tu backend lo soporta). Hace fallback local si falla. */
   updateMe(data: Partial<User>): Observable<User> {
-    return this.http.put<User>(`${this.apiUrl}/me`, data, {
-      headers: this.getAuthHeaders(),
-    }).pipe(
-      tap(u => this.setUser({ ...(this.getUser() ?? {}), ...u } as User)),
-      catchError(() => {
-        // si no existe el endpoint, al menos actualiza localmente
-        this.applyUserPatch(data);
-        return of(this.getUser() as User);
+    return this.http
+      .put<User>(`${this.apiUrl}/me`, data, {
+        headers: this.getAuthHeaders(),
       })
-    );
+      .pipe(
+        tap((u) =>
+          this.setUser({ ...(this.getUser() ?? {}), ...u } as User)
+        ),
+        catchError(() => {
+          this.applyUserPatch(data);
+          return of(this.getUser() as User);
+        })
+      );
   }
 
   // ===========================
@@ -157,22 +163,29 @@ export class UserService {
       .pipe(
         tap((response) => {
           if (response.access_token) this.setToken(response.access_token);
-          if (response.user) this.setUser({ ...response.user, provider: 'local' });
+          if (response.user) {
+            this.setUser({
+              id: response.user['id'] as string,
+              sub: (response.user['id'] as string) || response.user.email!,
+              name: response.user.name!,
+              email: response.user.email!,
+              provider: 'local',
+            });
+          }
         })
       );
   }
 
-  // UserService
   getLoggedUser(opts: { soft?: boolean } = {}): Observable<User | null> {
     return this.http
       .get<User>(`${this.apiUrl}/me`, { headers: this.getAuthHeaders() })
       .pipe(
-        tap(u => this.setUser({ ...(this.getUser() ?? {}), ...u } as User)),
-        catchError(err => {
-          // Si estamos en modo "soft", NO hagas logout (útil para login Google o si el backend no reconoce el token)
+        tap((u) =>
+          this.setUser({ ...(this.getUser() ?? {}), ...u } as User)
+        ),
+        catchError((err) => {
           if (!opts.soft) {
-            // solo cierra sesión si de verdad quieres comportamiento estricto
-            if (err?.status === 401 && (this.getUser()?.provider === 'local')) {
+            if (err?.status === 401 && this.getUser()?.provider === 'local') {
               this.logoutUser();
             }
           }
@@ -184,7 +197,6 @@ export class UserService {
   logoutUser(): void {
     this.setToken(null);
     this.setUser(null);
-    // 🔹 Extra por seguridad
     localStorage.removeItem('ff_user');
     localStorage.removeItem('ff_logged_in');
   }
@@ -233,6 +245,7 @@ export class UserService {
     const payload = this.parseJwt(resp.credential);
 
     const user: User = {
+      sub: payload.sub || payload.email,
       name: payload.name,
       email: payload.email,
       picture: payload.picture,

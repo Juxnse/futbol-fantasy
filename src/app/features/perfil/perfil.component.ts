@@ -1,9 +1,8 @@
+// src/app/features/perfil/perfil.component.ts
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
-import { UserService } from '../../../app/auth/services/user.service';
-import { User } from '../../../app/auth/services/user.service';
-
+import { UserService, User } from '../../../app/auth/services/user.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -16,12 +15,12 @@ export class PerfilComponent implements OnInit, OnDestroy {
 
   user: User | null = null;
   loading = false;
-  avatarPreview: string | null = null; // base64 para vista previa
+  avatarPreview: string | null = null;
 
   form = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(2)]],
-    email: [{ value: '', disabled: true }], // editable solo si provider=local
-    picture: [''], // base64/string URL
+    email: [{ value: '', disabled: true }],
+    picture: [''],
   });
 
   get isGoogle() { return this.user?.provider === 'google'; }
@@ -29,30 +28,26 @@ export class PerfilComponent implements OnInit, OnDestroy {
   constructor(private fb: FormBuilder, private userService: UserService) {}
 
   ngOnInit(): void {
-  // Estado actual “reactivo”
-  this.userService.user$
-    .pipe(takeUntil(this.destroy$))
-    .subscribe(u => {
-      this.user = u;
-      this.form.patchValue({
-        name: u?.name ?? '',
-        email: u?.email ?? '',
-        picture: u?.picture ?? '',
+    this.userService.user$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(u => {
+        this.user = u;
+        this.form.patchValue({
+          name: u?.name ?? '',
+          email: u?.email ?? '',
+          picture: u?.picture ?? '',
+        });
+        this.avatarPreview = u?.picture ?? null;
+
+        if (u?.provider === 'local') this.form.get('email')?.enable();
+        else this.form.get('email')?.disable();
       });
-      this.avatarPreview = u?.picture ?? null;
 
-      if (u?.provider === 'local') this.form.get('email')?.enable();
-      else this.form.get('email')?.disable();
-    });
-
-  // ✅ Solo intenta refrescar desde backend si el provider es "local"
-  const u0 = this.userService.getUser();
-  if (u0?.provider === 'local' && this.userService.getToken()) {
-    // modo soft: no cierra la sesión si falla
-    this.userService.getLoggedUser({ soft: true }).subscribe();
+    const u0 = this.userService.getUser();
+    if (u0?.provider === 'local' && this.userService.getToken()) {
+      this.userService.getLoggedUser({ soft: true }).subscribe();
+    }
   }
-}
-
 
   onPickAvatar(input: HTMLInputElement) { input.click(); }
 
@@ -77,28 +72,25 @@ export class PerfilComponent implements OnInit, OnDestroy {
 
     const payload: Partial<User> = {
       name: this.form.value.name!,
-      // email: (this.isGoogle ? this.user.email : this.form.value.email!) // si quieres permitir email local
       picture: this.form.value.picture || this.avatarPreview || this.user.picture,
     };
 
     this.loading = true;
 
-    // 1) Si hay id => intenta actualizar en backend
     if (this.user.id) {
       this.userService.updateUser(this.user.id, payload).subscribe({
         next: () => this.finishOk(payload),
-        error: () => this.finishLocal(payload), // si falla backend, al menos actualiza localmente
+        error: () => this.finishLocal(payload),
       });
       return;
     }
 
-    // 2) Sin id (p.ej. login Google sin intercambio) => actualiza local
     this.finishLocal(payload);
   }
 
   private finishOk(patch: Partial<User>) {
     this.loading = false;
-    this.userService.applyUserPatch(patch); // actualiza estado/localStorage
+    this.userService.applyUserPatch(patch);
     Swal.fire({ icon: 'success', title: 'Perfil actualizado', timer: 1400, showConfirmButton: false });
   }
 
