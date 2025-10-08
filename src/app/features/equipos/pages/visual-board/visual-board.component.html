@@ -1,0 +1,58 @@
+<div class="cancha-container">
+  <h2>Tu equipo: <span>{{ formacion }}</span></h2>
+
+  <div class="cancha">
+    <!-- 🔹 Delanteros -->
+    <div class="linea fw">
+      <div class="jugador" *ngFor="let j of lineas.FW">
+        <div class="avatar fw">
+          {{ j.nombre[0] }}
+          <span class="brillo"></span>
+        </div>
+        <p class="nombre">{{ j.nombre }}</p>
+        <p class="puntaje">⭐ {{ j.global | number: '1.1-1' }}</p>
+      </div>
+    </div>
+
+    <!-- 🔹 Mediocampistas -->
+    <div class="linea mf">
+      <div class="jugador" *ngFor="let j of lineas.MF">
+        <div class="avatar mf">
+          {{ j.nombre[0] }}
+          <span class="brillo"></span>
+        </div>
+        <p class="nombre">{{ j.nombre }}</p>
+        <p class="puntaje">⭐ {{ j.global | number: '1.1-1' }}</p>
+      </div>
+    </div>
+
+    <!-- 🔹 Defensas -->
+    <div class="linea df">
+      <div class="jugador" *ngFor="let j of lineas.DF">
+        <div class="avatar df">
+          {{ j.nombre[0] }}
+          <span class="brillo"></span>
+        </div>
+        <p class="nombre">{{ j.nombre }}</p>
+        <p class="puntaje">⭐ {{ j.global | number: '1.1-1' }}</p>
+      </div>
+    </div>
+
+    <!-- 🔹 Portero -->
+    <div class="linea gk">
+      <div class="jugador" *ngFor="let j of lineas.GK">
+        <div class="avatar gk">
+          {{ j.nombre[0] }}
+          <span class="brillo"></span>
+        </div>
+        <p class="nombre">{{ j.nombre }}</p>
+        <p class="puntaje">⭐ {{ j.global | number: '1.1-1' }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="acciones">
+    <button mat-stroked-button routerLink="/equipos/mi-equipo">⚙️ Volver a editar</button>
+    <button mat-raised-button color="primary" routerLink="/home">🏁 Finalizar</button>
+  </div>
+</div>

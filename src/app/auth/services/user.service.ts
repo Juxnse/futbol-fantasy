@@ -1,191 +1,103 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import {
-  BehaviorSubject,
-  Observable,
-  tap,
-  of,
-  catchError,
-} from 'rxjs';
+import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
+import { User } from '../models/user.model';
 
 declare const google: any;
 
-export interface User {
-  id?: string;
-  name: string;
-  email: string;
-  picture?: string;
-  provider?: 'local' | 'google';
-  [k: string]: any;
-}
-
-interface AuthResponse {
-  access_token?: string;
-  user?: User;
-}
-
 @Injectable({ providedIn: 'root' })
 export class UserService {
-  private apiUrl = 'https://football-fantasy-back.onrender.com/users';
+  private readonly USERS_KEY = 'ff_users';
+  private readonly USER_KEY = 'ff_user';
+  private readonly LOGGED_KEY = 'ff_logged_in';
 
-  private clientId =
-    '41563777174-th5masuqcivb0t3eb30brqsugd1ojjrh.apps.googleusercontent.com';
-
-  private googleReady: Promise<void>;
-  private googleReadyResolver!: () => void;
+  private readonly GOOGLE_CLIENT_ID = '41563777174-th5masuqcivb0t3eb30brqsugd1ojjrh.apps.googleusercontent.com';
 
   private userSubject = new BehaviorSubject<User | null>(null);
-  private tokenSubject = new BehaviorSubject<string | null>(null);
-
   readonly user$ = this.userSubject.asObservable();
-  readonly token$ = this.tokenSubject.asObservable();
 
-  constructor(private http: HttpClient) {
-    this.googleReady = new Promise<void>((resolve) => {
-      this.googleReadyResolver = resolve;
-    });
-    this.waitForGoogle();
-
-    // 🔹 Sincroniza con localStorage
-    const token = localStorage.getItem('token');
-    const userRaw = localStorage.getItem('user');
-    const user = userRaw ? (JSON.parse(userRaw) as User) : null;
-    if (token) this.tokenSubject.next(token);
-    if (user) this.userSubject.next(user);
+  constructor() {
+    const savedUser = localStorage.getItem(this.USER_KEY);
+    if (savedUser) this.userSubject.next(JSON.parse(savedUser));
   }
 
-  // ===========================
-  // Token
-  // ===========================
-  private setToken(token: string | null): void {
-    if (token) {
-      localStorage.setItem('token', token);
-    } else {
-      localStorage.removeItem('token');
+  // 🧩 Obtener usuarios locales
+  private getAllUsers(): User[] {
+    return JSON.parse(localStorage.getItem(this.USERS_KEY) || '[]');
+  }
+
+  private saveAllUsers(users: User[]): void {
+    localStorage.setItem(this.USERS_KEY, JSON.stringify(users));
+  }
+
+  // 🧩 Registro local
+  createUser(user: Omit<User, 'id'>): Observable<User> {
+    const users = this.getAllUsers();
+    if (users.some(u => u.email === user.email)) {
+      return throwError(() => new Error('El correo ya está registrado'));
     }
-    this.tokenSubject.next(token);
+
+    const newUser: User = {
+      ...user,
+      id: crypto.randomUUID(),
+      createdAt: new Date().toISOString(),
+      provider: 'local'
+    };
+
+    users.push(newUser);
+    this.saveAllUsers(users);
+    return of(newUser);
   }
 
-  getToken(): string | null {
-    return this.tokenSubject.value;
+  // 🧩 Login local
+  loginUser(credentials: { email: string; password: string }): Observable<User> {
+    const users = this.getAllUsers();
+    const found = users.find(
+      u => u.email === credentials.email && u.password === credentials.password
+    );
+
+    if (!found) {
+      return throwError(() => new Error('Credenciales inválidas'));
+    }
+
+    this.setUser(found);
+    return of(found);
   }
 
-  private getAuthHeaders(): HttpHeaders {
-    const token = this.getToken();
-    const headers: Record<string, string> = {};
-    if (token) headers['Authorization'] = `Bearer ${token}`;
-    return new HttpHeaders(headers);
-  }
-
-  // ===========================
-  // User helpers
-  // ===========================
-  private setUser(user: User | null): void {
+  // 🧩 Setear sesión
+  private setUser(user: User | null) {
     if (user) {
-      localStorage.setItem('user', JSON.stringify(user));
-
-      // 🔹 Compatibilidad con torneos
-      localStorage.setItem('ff_user', JSON.stringify(user));
-      localStorage.setItem('ff_logged_in', 'true');
+      localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+      localStorage.setItem(this.LOGGED_KEY, 'true');
+      this.userSubject.next(user);
     } else {
-      localStorage.removeItem('user');
-
-      // 🔹 Limpieza para torneos
-      localStorage.removeItem('ff_user');
-      localStorage.removeItem('ff_logged_in');
+      localStorage.removeItem(this.USER_KEY);
+      localStorage.removeItem(this.LOGGED_KEY);
+      this.userSubject.next(null);
     }
-
-    this.userSubject.next(user);
   }
 
+  // 🧩 Obtener usuario logueado
   getUser(): User | null {
     return this.userSubject.value;
   }
 
   isLoggedIn(): boolean {
-    return !!this.getToken() || !!localStorage.getItem('ff_logged_in');
+    return localStorage.getItem(this.LOGGED_KEY) === 'true';
   }
 
-  // ===========================
-  // Users CRUD
-  // ===========================
-  getUsers(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.apiUrl}/`, {
-      headers: this.getAuthHeaders(),
-    });
-  }
-
-  createUser(userData: Partial<User>): Observable<User> {
-    return this.http.post<User>(`${this.apiUrl}/`, userData);
-  }
-
-  deleteUser(userId: string): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/${userId}`, {
-      headers: this.getAuthHeaders(),
-    });
-  }
-
-  updateUser(userId: string, data: Partial<User>): Observable<User> {
-    return this.http.put<User>(`${this.apiUrl}/${userId}`, data, {
-      headers: this.getAuthHeaders(),
-    });
-  }
-
-  // ===========================
-  // Auth
-  // ===========================
-  loginUser(credentials: { email: string; password: string }): Observable<AuthResponse> {
-    return this.http
-      .post<AuthResponse>(`${this.apiUrl}/login`, credentials)
-      .pipe(
-        tap((response) => {
-          if (response.access_token) this.setToken(response.access_token);
-          if (response.user) this.setUser({ ...response.user, provider: 'local' });
-        })
-      );
-  }
-
-  getLoggedUser(): Observable<User | null> {
-    return this.http
-      .get<User>(`${this.apiUrl}/me`, { headers: this.getAuthHeaders() })
-      .pipe(
-        tap((u) => this.setUser(u)),
-        catchError(() => {
-          this.logoutUser();
-          return of(null);
-        })
-      );
-  }
-
-  logoutUser(): void {
-    this.setToken(null);
+  logout(): void {
     this.setUser(null);
-
-    // 🔹 Extra por seguridad
-    localStorage.removeItem('ff_user');
-    localStorage.removeItem('ff_logged_in');
   }
 
-  // ===========================
-  // Google Login
-  // ===========================
-  private waitForGoogle() {
-    const check = () => {
-      const ok =
-        typeof window !== 'undefined' &&
-        (window as any).google &&
-        (window as any).google.accounts &&
-        (window as any).google.accounts.id;
-      if (ok) this.googleReadyResolver();
-      else setTimeout(check, 50);
-    };
-    check();
-  }
+  // ============================================================
+  // 🔹 INICIO DE SESIÓN CON GOOGLE
+  // ============================================================
 
   async initGoogle() {
-    await this.googleReady;
+    if (typeof google === 'undefined') return;
+
     google.accounts.id.initialize({
-      client_id: this.clientId,
+      client_id: this.GOOGLE_CLIENT_ID,
       callback: (resp: any) => this.handleGoogleCredential(resp),
       auto_select: false,
       cancel_on_tap_outside: true,
@@ -193,9 +105,11 @@ export class UserService {
   }
 
   async renderGoogleButton(elementId: string) {
-    await this.googleReady;
+    if (typeof google === 'undefined') return;
+
     const el = document.getElementById(elementId);
     if (!el) return;
+
     google.accounts.id.renderButton(el, {
       theme: 'filled_blue',
       size: 'large',
@@ -210,14 +124,15 @@ export class UserService {
     const payload = this.parseJwt(resp.credential);
 
     const user: User = {
+      id: crypto.randomUUID(),
       name: payload.name,
       email: payload.email,
       picture: payload.picture,
       provider: 'google',
+      createdAt: new Date().toISOString(),
     };
 
     this.setUser(user);
-    this.setToken(resp.credential);
 
     const event = new CustomEvent('googleLoginSuccess');
     window.dispatchEvent(event);
@@ -229,12 +144,12 @@ export class UserService {
     const jsonPayload = decodeURIComponent(
       atob(base64)
         .split('')
-        .map(
-          (c) =>
-            '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-        )
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
         .join('')
     );
     return JSON.parse(jsonPayload);
   }
 }
+
+// Export explícito para evitar errores TS
+export type { User };

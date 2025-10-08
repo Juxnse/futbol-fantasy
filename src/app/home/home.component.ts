@@ -1,92 +1,113 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { Subject, map, takeUntil } from 'rxjs';
-import { UserService } from 'src/app/auth/services/user.service';
-import { SquadStateService } from 'src/app/features/equipos/services/squad-state.service'; // 👈 nuevo
-import Swal from 'sweetalert2';
+import { Component, OnInit } from '@angular/core';
+import { SquadStateService } from '../features/equipos/services/squad-state.service';
+import { UserService, User } from '../auth/services/user.service';
+
+interface Player {
+  id: number;
+  nombre: string;
+  posicion: string;
+  global: number;
+}
+
+interface Liga {
+  nombre: string;
+  top5: { name: string; points: number }[];
+}
+
+interface Noticia {
+  player: string;
+  note: string;
+  type: 'lesion' | 'suspension' | 'duda';
+}
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
-export class HomeComponent implements OnInit, OnDestroy {
-  private destroy$ = new Subject<void>();
-
-  // nombre que se actualiza automáticamente
+export class HomeComponent implements OnInit {
+  user: User | null = null;
   userName = 'Manager';
 
-  // si prefieres usar en plantilla con async pipe:
-  isLoggedIn$ = this.userService.token$.pipe(map(Boolean));
+  equipoGuardado = false;
+  formacion = '';
+  puntajeTotal = 0;
+  jugadoresSeleccionados: Player[] = [];
 
-  constructor(
-    public userService: UserService,
-    private router: Router,
-    private squadState: SquadStateService, // 👈 inyectado
-  ) {}
+  showToast = false; // 🔹 aparece cuando no tiene equipo
 
-  ngOnInit(): void {
-    // Suscríbete al usuario reactivo; cuando hagas logout pasa a null => "Manager"
-    this.userService.user$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(u => this.userName = u?.name ?? 'Manager');
-
-    // 👇 Escucha la formación del equipo (BehaviorSubject emite valor actual e inmediatos cambios)
-    this.squadState.formation$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(f => this.squad.formation = f);
-  }
-
-  isLoggedIn() {
-    return this.userService.isLoggedIn();
-  }
-
-  logout() {
-    this.userService.logoutUser();
-    // navega (opcional) para asegurar estado de inicio
-    this.router.navigate(['/home']);
-    Swal.fire({
-      icon: 'info',
-      title: 'Sesión cerrada',
-      text: 'Has salido de tu cuenta',
-      timer: 1600,
-      showConfirmButton: false,
-    });
-  }
-
-  // ==== estado del dashboard ====
-  squad = { status: 'incompleta', formation: '4-3-3', budget: 96, transfersLeft: 3 };
-
-  matchweek = {
-    number: 3,
-    fixtures: [
-      { home: 'DIM', away: 'Junior', date: new Date('2025-09-06T19:00:00'), myPlayers: 2 },
-      { home: 'Nacional', away: 'Cali', date: new Date('2025-09-07T17:30:00'), myPlayers: 1 },
-      { home: 'Tolima', away: 'Millonarios', date: new Date('2025-09-07T20:00:00'), myPlayers: 0 },
-    ],
-  };
-
-  league = {
-    name: 'Liga de Amigos',
+  liga: Liga = {
+    nombre: 'Liga Colombiana',
     top5: [
-      { name: 'Ana', points: 182 },
-      { name: 'Carlos', points: 176 },
-      { name: 'Tú', points: 169, me: true },
-      { name: 'Luisa', points: 160 },
-      { name: 'Mateo', points: 152 },
+      { name: 'Juanse', points: 132 },
+      { name: 'Andrés', points: 118 },
+      { name: 'Felipe', points: 110 },
+      { name: 'Camilo', points: 104 },
+      { name: 'Valentina', points: 97 },
     ],
-    me: { pos: 3, delta: +2 },
   };
 
-  news = [
-    { player: 'J. Pérez', type: 'lesion', note: 'Molestia muscular — duda para J-3' },
-    { player: 'R. Díaz', type: 'duda',   note: 'Descanso programado, 50%' },
-    { player: 'M. Gómez', type: 'suspension', note: 'Acum. amarillas — no juega' },
-    { player: 'A. Ramírez', type: 'lesion', note: 'Rodilla — 2 semanas' },
+  news: Noticia[] = [
+    { player: 'David Ospina', note: 'Sigue en duda por molestia muscular.', type: 'duda' },
+    { player: 'Edwin Cardona', note: 'Suspendido por acumulación de amarillas.', type: 'suspension' },
+    { player: 'Matheus Uribe', note: 'Lesión de rodilla — baja 2 semanas.', type: 'lesion' },
+    { player: 'Luis Sandoval', note: 'Duda para el próximo partido.', type: 'duda' },
   ];
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+  constructor(private squad: SquadStateService, private userService: UserService) {}
+
+  ngOnInit(): void {
+    this.loadUserAndTeam();
+    window.addEventListener('storage', () => this.loadUserAndTeam());
+  }
+
+  /** Cargar usuario actual y su equipo */
+  loadUserAndTeam(): void {
+    this.user = this.userService.getUser();
+
+    if (this.user) {
+      this.userName = this.user.name || this.user.email || 'Manager';
+      const storageKey = `mi_equipo_${this.user.email}`;
+      const equipoGuardado = localStorage.getItem(storageKey);
+
+      if (equipoGuardado) {
+        const equipo = JSON.parse(equipoGuardado);
+        this.formacion = equipo.formacion;
+        this.jugadoresSeleccionados = equipo.jugadores || [];
+        this.puntajeTotal = equipo.puntajeTotal || 0;
+        this.equipoGuardado = true;
+        this.squad.setFormation(this.formacion);
+        return;
+      }
+    }
+
+    // 🧹 Si no hay usuario o equipo
+    this.equipoGuardado = false;
+    this.formacion = '';
+    this.puntajeTotal = 0;
+    this.jugadoresSeleccionados = [];
+
+    // ✅ Mostramos el aviso tipo toast (solo informativo)
+    this.showToast = true;
+    setTimeout(() => (this.showToast = false), 4000);
+  }
+
+  /** Ver tablero táctico */
+  verTablero() {
+    if (this.user && this.equipoGuardado) {
+      window.location.href = '/equipos/visual';
+    } else {
+      window.location.href = '/login';
+    }
+  }
+
+  /** Editar o crear equipo */
+  editarAlineacion() {
+    if (this.user) {
+      const destino = this.equipoGuardado ? '/equipos/mi-equipo' : '/equipos/crear';
+      window.location.href = destino;
+    } else {
+      window.location.href = '/login';
+    }
   }
 }

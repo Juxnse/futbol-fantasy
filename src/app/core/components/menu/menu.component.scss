@@ -47,7 +47,74 @@
   }
 }
 
-/* Responsive: menú compacto en pantallas pequeñas */
+/* === Submenú (Mi equipo con acordeón) === */
+.submenu {
+  margin-top: 0.6rem;
+
+  .submenu-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.9rem 1.4rem;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.3s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .title-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .toggle-icon {
+      font-size: 20px;
+      transition: transform 0.25s ease;
+    }
+  }
+
+  .submenu-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+    display: flex;
+    flex-direction: column;
+
+    &.open {
+      max-height: 250px;
+    }
+
+    a {
+      display: flex;
+      align-items: center;
+      padding: 0.6rem 2.8rem;
+      color: #f5f5f5;
+      text-decoration: none;
+      font-weight: 400;
+      transition: all 0.25s ease;
+      border-radius: 10px;
+      font-size: 0.95rem;
+
+      mat-icon {
+        margin-right: 10px;
+        font-size: 20px;
+        opacity: 0.85;
+      }
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.08);
+        transform: translateX(5px);
+      }
+    }
+  }
+}
+
+/* === Responsive === */
 @media (max-width: 720px) {
   .menu ul li a {
     padding: 0.8rem 1rem;

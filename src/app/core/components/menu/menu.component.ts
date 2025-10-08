@@ -1,26 +1,55 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
-import { UserService } from 'src/app/auth/services/user.service';
+import { UserService, User } from 'src/app/auth/services/user.service';
 
 @Component({
   selector: 'app-menu',
   templateUrl: './menu.component.html',
   styleUrls: ['./menu.component.scss'],
 })
-export class MenuComponent {
-  @Output() close = new EventEmitter<void>(); // opcional: para cerrar el sidenav tras navegar
+export class MenuComponent implements OnInit {
+  @Output() close = new EventEmitter<void>();
+
+  user: User | null = null;
+  equipoGuardado = false;
+  showEquipoMenu = false; // ✅ control del acordeón
 
   constructor(private router: Router, public userService: UserService) {}
 
-  openTeam(ev?: MouseEvent) {
+  ngOnInit(): void {
+    this.loadUserAndTeam();
+    window.addEventListener('storage', () => this.loadUserAndTeam());
+  }
+
+  loadUserAndTeam(): void {
+    this.user = this.userService.getUser();
+
+    if (this.user) {
+      const equipo = localStorage.getItem(`mi_equipo_${this.user.email}`);
+      this.equipoGuardado = !!equipo;
+    } else {
+      this.equipoGuardado = false;
+    }
+  }
+
+  /** ✅ Desplegar/ocultar submenú */
+  toggleEquipoMenu(): void {
+    this.showEquipoMenu = !this.showEquipoMenu;
+  }
+
+  /** ✅ Cierra menú y navega */
+  navigate(route: string): void {
+    this.router.navigate([route]);
+    this.close.emit();
+  }
+
+  /** ✅ Si intenta abrir Mi equipo sin login */
+  openTeam(ev?: MouseEvent): void {
     if (this.userService.isLoggedIn()) {
-      // dejar que el routerLink navegue y cerrar el menú
-      this.close.emit();
-      return;
+      return; // el routerLink funciona normalmente
     }
 
-    // Bloquea la navegación del routerLink y redirige a login con aviso
     ev?.preventDefault();
     Swal.fire({
       icon: 'info',

@@ -1,0 +1,245 @@
+/* 🔹 Contenedor principal */
+.my-team-container {
+  padding: 1.5rem;
+  background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+  min-height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  transition: background 0.3s ease-in-out;
+
+  h2 {
+    color: #1e3a8a;
+    margin-bottom: 0.5rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    text-align: center;
+  }
+
+  .formation {
+    color: #475569;
+    font-weight: 500;
+    margin-bottom: 1.2rem;
+    text-align: center;
+  }
+
+  /* 🔹 Barra de filtros */
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 1.5rem;
+    justify-content: center;
+
+    button {
+      border-radius: 10px;
+      font-weight: 600;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0.45rem 0.9rem;
+      background: #f1f5f9;
+      color: #0f172a;
+      border: 1px solid #cbd5e1;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+      mat-icon {
+        font-size: 20px;
+      }
+
+      &:hover {
+        background: #dbeafe;
+        transform: translateY(-2px);
+      }
+
+      &.active {
+        background: linear-gradient(135deg, #2563eb, #1e3a8a);
+        color: #fff;
+        border-color: #1d4ed8;
+        box-shadow: 0 3px 10px rgba(37, 99, 235, 0.35);
+      }
+    }
+  }
+
+  /* 🔹 Contenedor del bloque de equipos */
+  .team-block {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 1.2rem 1.4rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+    margin-bottom: 1.4rem;
+    border-left: 5px solid #2563eb;
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    h3 {
+      color: #1e40af;
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+
+      small {
+        font-weight: 400;
+        color: #64748b;
+      }
+    }
+
+    .players-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 0.8rem;
+      transition: all 0.3s ease;
+    }
+
+    /* 🔹 Tarjeta de jugador */
+    .player-card {
+      background: #e2e8f0;
+      border-radius: 10px;
+      padding: 0.8rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s ease, opacity 0.25s ease;
+      border: 2px solid transparent;
+      position: relative;
+      opacity: 1;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+
+      &:hover {
+        background: #bfdbfe;
+        transform: translateY(-3px);
+      }
+
+      &.selected {
+        background: linear-gradient(135deg, #1e40af, #2563eb);
+        color: #fff;
+        border-color: #1d4ed8;
+        transform: scale(1.05);
+        box-shadow: 0 6px 14px rgba(29, 78, 216, 0.35);
+
+        &::after {
+          content: '✓';
+          position: absolute;
+          top: 6px;
+          right: 10px;
+          font-size: 1rem;
+          color: #fff;
+          background: rgba(255, 255, 255, 0.2);
+          border-radius: 50%;
+          width: 22px;
+          height: 22px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          backdrop-filter: blur(4px);
+        }
+      }
+
+      .rating {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #2563eb;
+        display: block;
+        margin-top: 0.3rem;
+      }
+
+      span {
+        display: block;
+      }
+
+      small {
+        font-size: 0.8rem;
+        color: #334155;
+      }
+    }
+  }
+
+  /* 🔹 Footer inferior */
+  .footer {
+    margin-top: 2rem;
+    text-align: right;
+
+    p {
+      margin-bottom: 0.4rem;
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    button {
+      border-radius: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 0.6rem 1.4rem;
+      background: linear-gradient(135deg, #1e40af, #1d4ed8);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+      color: #fff;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: linear-gradient(135deg, #2563eb, #1e3a8a);
+        box-shadow: 0 8px 18px rgba(29, 78, 216, 0.3);
+        transform: translateY(-2px);
+      }
+    }
+  }
+}
+
+/* 🔹 Botón flotante “Ver tablero táctico” */
+.btn-tablero {
+  position: fixed;
+  right: 28px;
+  background: linear-gradient(135deg, #2563eb, #1e3a8a);
+  color: #fff;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 0.6rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transition: all 0.3s ease;
+  animation: slideIn 0.6s ease forwards;
+  border: none;
+  z-index: 2000; /* ✅ más alto que el header */
+
+  mat-icon {
+    font-size: 22px;
+  }
+
+  &:hover {
+    background: linear-gradient(135deg, #1d4ed8, #172554);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 🔹 Ajuste automático del top se hace desde el TS */
+
+/* 🔹 Responsividad */
+@media (max-width: 768px) {
+  .btn-tablero {
+    top: auto !important;
+    bottom: 20px;
+    right: 20px;
+    font-size: 0.85rem;
+    padding: 0.5rem 0.9rem;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  }
+}
+
+  .team-block .players-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  }
+  

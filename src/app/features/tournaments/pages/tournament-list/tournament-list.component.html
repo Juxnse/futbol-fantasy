@@ -1,68 +1,191 @@
-<div class="tournaments">
-  <h2>🏆 Torneos Disponibles</h2>
+<div class="tournament-container">
+  <div class="header">
+    <h2>Torneos disponibles</h2>
+    <div class="actions">
+      <button mat-flat-button color="primary" (click)="openCreateDialog()">
+        + Crear torneo
+      </button>
+      <button
+        mat-stroked-button
+        (click)="setView('grid')"
+        [disabled]="viewMode === 'grid'"
+      >
+        <mat-icon>grid_view</mat-icon>
+      </button>
+      <button
+        mat-stroked-button
+        (click)="setView('list')"
+        [disabled]="viewMode === 'list'"
+      >
+        <mat-icon>list</mat-icon>
+      </button>
+    </div>
+  </div>
 
-  <!-- Botón Crear -->
-  <button mat-raised-button color="primary" (click)="openCreateDialog()">
-    ➕ Crear Torneo
-  </button>
-
-  <!-- Toggle de vista -->
-  <mat-chip-set class="view-toggle">
-    <mat-chip
-      selectable="false"
-      [class.active]="viewMode === 'grid'"
-      (click)="setView('grid')"
-    >
-      🟦 Grid
-    </mat-chip>
-    <mat-chip
-      selectable="false"
-      [class.active]="viewMode === 'list'"
-      (click)="setView('list')"
-    >
-      📋 Lista
-    </mat-chip>
-  </mat-chip-set>
-
-  <!-- Loading -->
   <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
 
-  <!-- Lista de torneos -->
-  <div
-    class="cards"
-    [ngClass]="viewMode"
-    *ngIf="tournaments$ | async as tournaments; else empty"
-  >
-    <mat-card *ngFor="let t of tournaments" class="tournament-card">
+  <div *ngIf="!(tournaments$ | async)?.length && !loading" class="empty-state">
+    <mat-icon>sports_soccer</mat-icon>
+    <p>No hay torneos creados todavía.</p>
+  </div>
+
+  <!-- ✅ Vista tipo GRID -->
+  <div *ngIf="viewMode === 'grid'" class="grid-view">
+    <mat-card *ngFor="let t of tournaments$ | async" class="tournament-card">
       <mat-card-header>
         <mat-card-title>{{ t.name }}</mat-card-title>
         <mat-card-subtitle>
-          {{ t.visibility === 'PUBLIC' ? 'Público' : 'Privado' }}
+          <mat-chip color="primary" selected>
+            {{ t.visibility === 'PUBLIC' ? 'Público' : 'Privado' }}
+          </mat-chip>
         </mat-card-subtitle>
       </mat-card-header>
 
       <mat-card-content>
-        <p><strong>Equipos:</strong> {{ t.currentTeams }} / {{ t.maxTeams }}</p>
-        <p><strong>Fechas:</strong> {{ t.startAt }} → {{ t.endAt }}</p>
+        <p>
+          <strong>Dueño:</strong>
+          <span
+            [class.owner-label]="isOwner(t.id)"
+            [class.owner-name]="!isOwner(t.id)"
+          >
+            {{ getOwner(t) }}
+          </span>
+        </p>
+
+        <p>
+          <strong>Miembros:</strong> {{ getMembersCount(t) }} /
+          {{ t.maxTeams }}
+        </p>
+        <p><strong>Inicio:</strong> {{ t.startAt | date : 'shortDate' }}</p>
+        <p><strong>Fin:</strong> {{ t.endAt | date : 'shortDate' }}</p>
       </mat-card-content>
 
-      <mat-card-actions>
-        <button
-          mat-raised-button
-          color="primary"
-          (click)="joinTournament(t.id)"
-          [disabled]="isMember(t.id)"
-        >
-          {{ isMember(t.id) ? 'Ya inscrito' : 'Unirse' }}
-        </button>
+      <mat-card-actions align="end">
+        <!-- Botones dinámicos -->
+        <ng-container *ngIf="!isMember(t.id)">
+          <button mat-raised-button color="accent" (click)="joinTournament(t.id)">
+            Unirse
+          </button>
+        </ng-container>
+
+        <ng-container *ngIf="isMember(t.id) && !isOwner(t.id)">
+          <button mat-stroked-button color="warn" (click)="leaveTournament(t.id)">
+            Salir
+          </button>
+        </ng-container>
+
+        <ng-container *ngIf="isOwner(t.id)">
+          <button mat-flat-button color="primary">Ver torneo</button>
+          <button mat-stroked-button color="warn" (click)="deleteTournament(t.id)">
+            Eliminar
+          </button>
+        </ng-container>
       </mat-card-actions>
     </mat-card>
   </div>
 
-  <!-- Estado vacío -->
-  <ng-template #empty>
-    <p style="margin-top: 16px; text-align: center;">
-      No hay torneos disponibles.
-    </p>
-  </ng-template>
+  <!-- ✅ Vista tipo LIST -->
+  <div *ngIf="viewMode === 'list'" class="list-view">
+    <table
+      mat-table
+      [dataSource]="(tournaments$ | async) || []"
+      class="mat-elevation-z2"
+    >
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Nombre</th>
+        <td mat-cell *matCellDef="let t">{{ t.name }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="owner">
+        <th mat-header-cell *matHeaderCellDef>Dueño</th>
+        <td mat-cell *matCellDef="let t">
+          <span [class.owner-label]="isOwner(t.id)" [class.owner-name]="!isOwner(t.id)">
+            {{ getOwner(t) }}
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="visibility">
+        <th mat-header-cell *matHeaderCellDef>Visibilidad</th>
+        <td mat-cell *matCellDef="let t">
+          <mat-chip
+            [color]="t.visibility === 'PUBLIC' ? 'primary' : 'accent'"
+            selected
+          >
+            {{ t.visibility }}
+          </mat-chip>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="teams">
+        <th mat-header-cell *matHeaderCellDef>Miembros</th>
+        <td mat-cell *matCellDef="let t">
+          {{ getMembersCount(t) }} / {{ t.maxTeams }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="dates">
+        <th mat-header-cell *matHeaderCellDef>Fechas</th>
+        <td mat-cell *matCellDef="let t">
+          {{ t.startAt | date : 'shortDate' }} -
+          {{ t.endAt | date : 'shortDate' }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Acciones</th>
+        <td mat-cell *matCellDef="let t">
+          <ng-container *ngIf="!isMember(t.id)">
+            <button
+              mat-raised-button
+              color="accent"
+              (click)="joinTournament(t.id)"
+            >
+              Unirse
+            </button>
+          </ng-container>
+
+          <ng-container *ngIf="isMember(t.id) && !isOwner(t.id)">
+            <button
+              mat-stroked-button
+              color="warn"
+              (click)="leaveTournament(t.id)"
+            >
+              Salir
+            </button>
+          </ng-container>
+
+          <ng-container *ngIf="isOwner(t.id)">
+            <button mat-flat-button color="primary">Ver</button>
+            <button mat-stroked-button color="warn" (click)="deleteTournament(t.id)">
+              Eliminar
+            </button>
+          </ng-container>
+        </td>
+      </ng-container>
+
+      <tr
+        mat-header-row
+        *matHeaderRowDef="[
+          'name',
+          'owner',
+          'visibility',
+          'teams',
+          'dates',
+          'actions'
+        ]"
+      ></tr>
+      <tr
+        mat-row
+        *matRowDef="let row; columns: [
+          'name',
+          'owner',
+          'visibility',
+          'teams',
+          'dates',
+          'actions'
+        ]"
+      ></tr>
+    </table>
+  </div>
 </div>

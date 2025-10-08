@@ -1,90 +1,93 @@
 <div class="home">
-  <!-- Saludo -->
+  <!-- 🔹 Bienvenida -->
   <header class="hero">
     <h1 class="hero-title">
-      Hola, <span class="name">{{ userName || 'Manager' }}</span> 👋
+      Bienvenido, <span class="name">{{ userName }}</span> 👋
     </h1>
     <p class="hero-sub">
-      Tu centro de control para la próxima jornada.
+      Administra tu equipo, revisa tu formación y compite en tu liga.
     </p>
   </header>
 
-  <!-- GRID de tarjetas -->
+  <!-- 🔹 Grid -->
   <section class="grid">
-    <!-- Mi plantilla -->
-    <article class="card">
+    <!-- 🧩 Mi Equipo -->
+    <article class="card equipo-card">
       <div class="card-head">
-        <h3>Mi plantilla</h3>
-        <span class="status" [class.ok]="squad.status==='completa'" [class.warn]="squad.status!=='completa'">
-          {{ squad.status | titlecase }}
+        <h3>Mi Equipo</h3>
+        <span
+          class="status"
+          [class.ok]="equipoGuardado"
+          [class.warn]="!equipoGuardado"
+        >
+          {{ equipoGuardado ? 'Guardado' : 'Incompleto' }}
         </span>
       </div>
+
       <ul class="kv">
-        <li><label>Formación</label><span>{{ squad.formation }}</span></li>
-        <li><label>Presupuesto</label><span>{{ squad.budget | number:'1.0-0' }} M</span></li>
-        <li><label>Cambios</label><span>{{ squad.transfersLeft }}</span></li>
+        <li>
+          <label>Formación</label>
+          <span>{{ formacion || 'No definida' }}</span>
+        </li>
+        <li>
+          <label>Puntaje total</label>
+          <span>{{ puntajeTotal | number: '1.1-1' }}</span>
+        </li>
+        <li>
+          <label>Jugadores</label>
+          <span>{{ jugadoresSeleccionados.length }}/11</span>
+        </li>
       </ul>
+
       <div class="actions">
-        <button mat-raised-button color="primary" routerLink="/equipos">Editar once</button>
-        <button mat-stroked-button routerLink="/mercado">Ir al mercado</button>
+        <button
+          mat-stroked-button
+          color="primary"
+          (click)="verTablero()"
+          [disabled]="!equipoGuardado"
+        >
+          Ver tablero táctico
+        </button>
+
+        <button mat-raised-button color="primary" (click)="editarAlineacion()">
+          {{ equipoGuardado ? 'Editar alineación' : 'Crear equipo' }}
+        </button>
       </div>
     </article>
 
-    <!-- Próxima jornada -->
-    <article class="card">
+    <!-- 🏆 Liga -->
+    <article class="card liga-card">
       <div class="card-head">
-        <h3>Próxima jornada</h3>
-        <span class="badge">J-{{ matchweek.number }}</span>
-      </div>
-      <div class="fixture">
-        <div class="row" *ngFor="let f of matchweek.fixtures | slice:0:3">
-          <div class="teams">
-            <span class="team">{{ f.home }}</span>
-            <span class="vs">vs</span>
-            <span class="team">{{ f.away }}</span>
-          </div>
-          <div class="meta">
-            <span class="dt">{{ f.date | date:'EEE d MMM, h:mm a' }}</span>
-            <span class="tag" *ngIf="f.myPlayers>0">{{ f.myPlayers }} en tu once</span>
-          </div>
-        </div>
-      </div>
-      <div class="actions">
-        <button mat-raised-button color="primary" routerLink="/equipos">Ajustar alineación</button>
-      </div>
-    </article>
-
-    <!-- Mi liga -->
-    <article class="card">
-      <div class="card-head">
-        <h3>Mi liga</h3>
-        <span class="badge alt">{{ league.name }}</span>
+        <h3>Mi Liga</h3>
+        <span class="badge alt">{{ liga.nombre }}</span>
       </div>
       <ul class="table mini">
         <li class="head"><span>#</span><span>Manager</span><span>Pts</span></li>
-        <li *ngFor="let r of league.top5; let i = index" [class.me]="r.me">
-          <span>{{ i+1 }}</span>
+        <li *ngFor="let r of liga.top5; let i = index">
+          <span>{{ i + 1 }}</span>
           <span>{{ r.name }}</span>
           <span>{{ r.points }}</span>
         </li>
       </ul>
-      <div class="me-pill" *ngIf="league.me">
-        Tu posición: <b>{{ league.me.pos }}</b> ({{ league.me.delta >= 0 ? '↑' : '↓' }} {{ league.me.delta | number:'1.0-0' }})
-      </div>
       <div class="actions">
-        <button mat-stroked-button routerLink="/ligas">Ver ranking completo</button>
+        <button mat-stroked-button routerLink="/ligas">Ver clasificación</button>
       </div>
     </article>
 
-    <!-- Noticias -->
-    <article class="card">
+    <!-- 📰 Noticias -->
+    <article class="card noticias-card">
       <div class="card-head">
-        <h3>Noticias de jugadores</h3>
+        <h3>Noticias recientes</h3>
         <span class="badge warn">{{ news.length }}</span>
       </div>
       <ul class="news">
-        <li *ngFor="let n of news | slice:0:4">
-          <span class="chip" [class.injury]="n.type==='lesion'" [class.sus]="n.type==='suspension'" [class.doubt]="n.type==='duda'">
+        <li *ngFor="let n of news | slice: 0: 4">
+          <span
+            class="chip"
+            [class.injury]="n.type === 'lesion'"
+            [class.sus]="n.type === 'suspension'"
+            [class.doubt]="n.type === 'duda'"
+          >
             {{ n.type | titlecase }}
           </span>
           <span class="txt"><b>{{ n.player }}</b> — {{ n.note }}</span>
@@ -95,4 +98,10 @@
       </div>
     </article>
   </section>
+
+  <!-- ✅ Toast informativo -->
+  <div class="toast" *ngIf="showToast">
+    <mat-icon>info</mat-icon>
+    <span>Aún no tienes equipo creado. Puedes hacerlo cuando quieras.</span>
+  </div>
 </div>

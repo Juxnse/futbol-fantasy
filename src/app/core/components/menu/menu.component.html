@@ -14,17 +14,57 @@
       </a>
     </li>
 
-    <li>
-      <!-- Usa routerLink para que el "active" funcione y bloquea con openTeam si no hay sesión -->
-      <a
-        routerLink="/equipos/crear"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: false }"
-        (click)="openTeam($event)"
-      >
-        <mat-icon>sports_soccer</mat-icon>
-        <span>Mi equipo</span>
-      </a>
+    <!-- ⚽ MI EQUIPO (con acordeón + / -) -->
+    <li class="submenu">
+      <div class="submenu-title" (click)="toggleEquipoMenu()">
+        <div class="title-left">
+          <mat-icon>sports_soccer</mat-icon>
+          <span>Mi equipo</span>
+        </div>
+        <mat-icon class="toggle-icon">
+          {{ showEquipoMenu ? 'remove' : 'add' }}
+        </mat-icon>
+      </div>
+
+      <div class="submenu-content" [class.open]="showEquipoMenu">
+        <!-- Usuario logueado -->
+        <ng-container *ngIf="user; else guest">
+          <a
+            *ngIf="!equipoGuardado"
+            routerLink="/equipos/crear"
+            (click)="navigate('/equipos/crear')"
+          >
+            <mat-icon>add_circle</mat-icon>
+            <span>Crear equipo</span>
+          </a>
+
+          <a
+            *ngIf="equipoGuardado"
+            routerLink="/equipos/visual"
+            (click)="navigate('/equipos/visual')"
+          >
+            <mat-icon>visibility</mat-icon>
+            <span>Ver tablero táctico</span>
+          </a>
+
+          <a
+            *ngIf="equipoGuardado"
+            routerLink="/equipos/mi-equipo"
+            (click)="navigate('/equipos/mi-equipo')"
+          >
+            <mat-icon>edit</mat-icon>
+            <span>Editar alineación</span>
+          </a>
+        </ng-container>
+
+        <!-- Usuario no logueado -->
+        <ng-template #guest>
+          <a (click)="openTeam($event)">
+            <mat-icon>login</mat-icon>
+            <span>Iniciar sesión</span>
+          </a>
+        </ng-template>
+      </div>
     </li>
 
     <li>

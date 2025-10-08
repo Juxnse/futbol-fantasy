@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { TournamentService } from '../../services/tournament.service';
-import { Tournament } from '../../models/tournament';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -30,25 +29,14 @@ export class CreateTournamentDialogComponent {
   save() {
     if (this.form.invalid) return;
 
-    const { name, visibility, maxTeams, startAt, endAt } = this.form.value;
+    const tournamentData = this.form.value;
 
-    // ⚡ Ajuste: asegurar que cumpla con la interface Tournament
-    const newTournament: Tournament = {
-      id: Date.now(),        // id mock único
-      name,
-      visibility,
-      maxTeams,
-      currentTeams: 0,       // arranca vacío
-      startAt,
-      endAt
-    };
-
-    this.service.create(newTournament).subscribe({
+    this.service.create(tournamentData).subscribe({
       next: () => {
         Swal.fire({
           icon: 'success',
           title: 'Torneo creado',
-          text: `${name} fue creado con éxito`,
+          text: `${tournamentData.name} fue creado con éxito`,
           timer: 2000,
           showConfirmButton: false,
         });
@@ -60,7 +48,7 @@ export class CreateTournamentDialogComponent {
           title: 'Error',
           text: 'No se pudo crear el torneo. Intenta de nuevo.',
         });
-      }
+      },
     });
   }
 

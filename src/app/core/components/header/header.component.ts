@@ -31,7 +31,7 @@ export class HeaderComponent implements OnInit {
   }
 
   logout() {
-    this.userService.logoutUser();
+    this.userService.logout();
     this.user = null;
     Swal.fire({
       icon: 'info',

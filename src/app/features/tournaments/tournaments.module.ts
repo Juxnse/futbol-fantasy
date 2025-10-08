@@ -13,6 +13,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips'; // 👈 IMPORTADO
+import { MatIconModule } from '@angular/material/icon';
 
 // Components
 import { TournamentListComponent } from './pages/tournament-list/tournament-list.component';
@@ -37,7 +38,8 @@ import { TournamentsRoutingModule } from './tournaments-routing.module';
     MatSelectModule,
     MatDialogModule,
     MatCardModule,
-    MatChipsModule // ✅ ahora reconoce mat-chip-list y mat-chip
+    MatChipsModule,
+    MatIconModule
   ]
 })
 export class TournamentsModule {}

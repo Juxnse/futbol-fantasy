@@ -1,9 +1,19 @@
+// ✅ src/app/features/tournaments/models/tournament.ts
+
 export interface Tournament {
-  id: number;                         // identificador único
-  name: string;                       // nombre del torneo
-  visibility: 'PUBLIC' | 'PRIVATE';   // visibilidad
-  maxTeams: number;                   // número máximo de equipos
-  currentTeams: number;               // número actual de equipos inscritos
-  startAt: string;                    // fecha de inicio (ISO string)
-  endAt: string;                      // fecha de fin (ISO string)
+  id: number;
+  name: string;
+  visibility: 'PUBLIC' | 'PRIVATE';
+  maxTeams: number;
+  currentTeams: number;
+  startAt: string;
+  endAt: string;
+  ownerId: string; // 👈 ID del dueño (usuario logueado)
+}
+
+export interface TournamentMember {
+  tournamentId: number;
+  userId: string;
+  role: 'OWNER' | 'MEMBER';
+  joinedAt: string;
 }

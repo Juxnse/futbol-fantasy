@@ -1,7 +1,7 @@
 import { Component, AfterViewInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { UserService } from 'src/app/auth/services/user.service';
+import { UserService } from '../services/user.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -12,7 +12,6 @@ import Swal from 'sweetalert2';
 export class LoginComponent implements AfterViewInit, OnDestroy {
   form: FormGroup;
   hidePassword = true;
-
   private googleLoginHandler = () => this.onGoogleLoginSuccess();
 
   constructor(
@@ -30,48 +29,46 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
     return this.form.controls;
   }
 
-  /** Login normal con backend/localStorage */
+  // 🚀 Login normal con localStorage
   submit() {
-    if (this.form.valid) {
-      const { email, password } = this.form.value;
-      this.userService.loginUser({ email, password }).subscribe({
-        next: (resp) => {
-          Swal.fire({
-            icon: 'success',
-            title: '✅ Sesión iniciada correctamente',
-            timer: 2000,
-            showConfirmButton: false
-          });
-          this.router.navigate(['/home']);
-        },
-        error: (err) => {
-          Swal.fire({
-            icon: 'error',
-            title: '❌ Credenciales inválidas',
-            text: err.error?.message || 'Revisa tu email o contraseña'
-          });
-        }
-      });
-    } else {
-      this.form.markAllAsTouched();
-    }
+    if (this.form.invalid) return this.form.markAllAsTouched();
+
+    const { email, password } = this.form.value;
+
+    this.userService.loginUser({ email, password }).subscribe({
+      next: () => {
+        Swal.fire({
+          icon: 'success',
+          title: '✅ Sesión iniciada correctamente',
+          timer: 2000,
+          showConfirmButton: false,
+        });
+        this.router.navigate(['/home']);
+      },
+      error: (err) => {
+        Swal.fire({
+          icon: 'error',
+          title: '❌ Credenciales inválidas',
+          text: err.message,
+        });
+      },
+    });
   }
 
-  /** Renderizar el botón de Google al cargar el componente */
+  // 🧩 Renderizar el botón de Google al cargar
   ngAfterViewInit(): void {
     this.userService.initGoogle();
     this.userService.renderGoogleButton('google-btn');
     window.addEventListener('googleLoginSuccess', this.googleLoginHandler);
   }
 
-  /** Limpiar listener al destruir el componente */
   ngOnDestroy(): void {
     window.removeEventListener('googleLoginSuccess', this.googleLoginHandler);
   }
 
-  /** Cuando Google login fue exitoso */
-  onGoogleLoginSuccess() {
-    const googleUser = this.userService.getUser(); // ✅ ya lo tenemos desde UserService.setUser()
+  // ✅ Cuando Google login fue exitoso
+  onGoogleLoginSuccess(): void {
+    const googleUser = this.userService.getUser();
 
     if (!googleUser) {
       Swal.fire({
@@ -86,8 +83,9 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
       icon: 'success',
       title: '✅ Sesión iniciada con Google',
       timer: 2000,
-      showConfirmButton: false
+      showConfirmButton: false,
     });
+
     this.router.navigate(['/home']);
   }
 }
