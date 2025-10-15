@@ -10,7 +10,8 @@ export class UserService {
   private readonly USER_KEY = 'ff_user';
   private readonly LOGGED_KEY = 'ff_logged_in';
 
-  private readonly GOOGLE_CLIENT_ID = '41563777174-th5masuqcivb0t3eb30brqsugd1ojjrh.apps.googleusercontent.com';
+  private readonly GOOGLE_CLIENT_ID =
+    '41563777174-th5masuqcivb0t3eb30brqsugd1ojjrh.apps.googleusercontent.com';
 
   private userSubject = new BehaviorSubject<User | null>(null);
   readonly user$ = this.userSubject.asObservable();
@@ -32,7 +33,7 @@ export class UserService {
   // 🧩 Registro local
   createUser(user: Omit<User, 'id'>): Observable<User> {
     const users = this.getAllUsers();
-    if (users.some(u => u.email === user.email)) {
+    if (users.some((u) => u.email === user.email)) {
       return throwError(() => new Error('El correo ya está registrado'));
     }
 
@@ -40,7 +41,7 @@ export class UserService {
       ...user,
       id: crypto.randomUUID(),
       createdAt: new Date().toISOString(),
-      provider: 'local'
+      provider: 'local',
     };
 
     users.push(newUser);
@@ -52,7 +53,8 @@ export class UserService {
   loginUser(credentials: { email: string; password: string }): Observable<User> {
     const users = this.getAllUsers();
     const found = users.find(
-      u => u.email === credentials.email && u.password === credentials.password
+      (u) =>
+        u.email === credentials.email && u.password === credentials.password
     );
 
     if (!found) {
@@ -85,14 +87,29 @@ export class UserService {
     return localStorage.getItem(this.LOGGED_KEY) === 'true';
   }
 
+  // ============================================================
+  // 🔹 LOGOUT CORREGIDO — mantiene equipos guardados
+  // ============================================================
   logout(): void {
+    const currentUser = this.getUser();
+
+    // 1️⃣ Solo limpiar la sesión del usuario
     this.setUser(null);
+
+    // 2️⃣ Mantener los equipos guardados en localStorage
+    // (ya no borra las claves "mi_equipo_email")
+
+    // 3️⃣ Emitir evento global para que Home y Menu se actualicen
+    window.dispatchEvent(new Event('storage'));
+
+    console.log(
+      `✅ Sesión cerrada${currentUser ? ' para ' + currentUser.email : ''}, equipo conservado.`
+    );
   }
 
   // ============================================================
   // 🔹 INICIO DE SESIÓN CON GOOGLE
   // ============================================================
-
   async initGoogle() {
     if (typeof google === 'undefined') return;
 
@@ -134,6 +151,7 @@ export class UserService {
 
     this.setUser(user);
 
+    // ✅ Notificar login exitoso a otros componentes
     const event = new CustomEvent('googleLoginSuccess');
     window.dispatchEvent(event);
   }

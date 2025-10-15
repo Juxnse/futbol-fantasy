@@ -44,10 +44,12 @@ export class MyTeamComponent implements OnInit, AfterViewInit {
   limites!: Limites;
   filtro = '';
   equipoGuardado = false;
-
-  // 🔹 Nuevo: usuario y clave dinámica
+  selectedCoach: string | null = null;
   user: User | null = null;
   storageKey = '';
+
+  // 🔹 Control de vista
+  modo: 'jugadores' | 'tecnicos' = 'jugadores';
 
   filtros = [
     { value: '', label: 'Todos', icon: 'group' },
@@ -66,7 +68,6 @@ export class MyTeamComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit(): void {
-    // 🔹 Obtener usuario actual y definir la clave de almacenamiento
     this.user = this.userService.getUser();
     this.storageKey = this.user
       ? `mi_equipo_${this.user.email}`
@@ -75,15 +76,14 @@ export class MyTeamComponent implements OnInit, AfterViewInit {
     this.formacion = this.squad.getFormation();
     this.definirLimites();
 
-    // 🔹 Cargar equipo guardado por usuario
     const equipoGuardado = localStorage.getItem(this.storageKey);
     if (equipoGuardado) {
       const equipo = JSON.parse(equipoGuardado);
       this.jugadoresSeleccionados = equipo.jugadores || [];
+      this.selectedCoach = equipo.tecnico || null;
       this.equipoGuardado = true;
     }
 
-    // 🔹 Cargar lista de equipos/jugadores
     fetch('assets/datos_jugadores_FF.json')
       .then((r) => r.json())
       .then((data) => {
@@ -91,7 +91,7 @@ export class MyTeamComponent implements OnInit, AfterViewInit {
           ...e,
           jugadores: e.jugadores.map((j) => ({
             ...j,
-            global: parseFloat((Math.random() * 10).toFixed(1)), // 🎲 puntaje aleatorio
+            global: parseFloat((Math.random() * 10).toFixed(1)),
           })),
         }));
       })
@@ -101,7 +101,6 @@ export class MyTeamComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    // 🔹 Ajustar posición del botón flotante según el header
     const header = document.querySelector('.header');
     const boton = this.el.nativeElement.querySelector('.btn-tablero');
 
@@ -110,19 +109,11 @@ export class MyTeamComponent implements OnInit, AfterViewInit {
       this.renderer.setStyle(boton, 'top', `${headerHeight + 16}px`);
       this.renderer.setStyle(boton, 'z-index', '2000');
     }
-
-    // 🔹 Reajustar si el usuario cambia tamaño de pantalla
-    window.addEventListener('resize', () => {
-      const header = document.querySelector('.header');
-      if (header && boton) {
-        const headerHeight = header.clientHeight;
-        this.renderer.setStyle(boton, 'top', `${headerHeight + 16}px`);
-      }
-    });
   }
 
   setFiltro(value: string) {
     this.filtro = value;
+    this.modo = 'jugadores';
   }
 
   definirLimites() {
@@ -159,21 +150,20 @@ export class MyTeamComponent implements OnInit, AfterViewInit {
       (j) => this.obtenerCategoria(j.posicion) === categoria
     ).length;
 
-    const limite = this.limites[categoria];
-    const total = this.jugadoresSeleccionados.length;
-
-    if (conteo >= limite) {
+    if (conteo >= this.limites[categoria]) {
       Swal.fire({
         icon: 'warning',
         title: 'Límite alcanzado',
-        text: `Solo puedes tener ${limite} ${this.nombreCategoria(categoria)}.`,
+        text: `Solo puedes tener ${this.limites[categoria]} ${this.nombreCategoria(
+          categoria
+        )}.`,
         timer: 1800,
         showConfirmButton: false,
       });
       return;
     }
 
-    if (total >= 11) {
+    if (this.jugadoresSeleccionados.length >= 11) {
       Swal.fire({
         icon: 'warning',
         title: 'Equipo completo',
@@ -185,6 +175,10 @@ export class MyTeamComponent implements OnInit, AfterViewInit {
     }
 
     this.jugadoresSeleccionados.push(jugador);
+  }
+
+  toggleCoach(nombre: string) {
+    this.selectedCoach = this.selectedCoach === nombre ? null : nombre;
   }
 
   nombreCategoria(cat: keyof Limites): string {
@@ -241,26 +235,51 @@ export class MyTeamComponent implements OnInit, AfterViewInit {
       return;
     }
 
+    if (!this.selectedCoach) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Falta el DT',
+        text: 'Debes seleccionar un Director Técnico para tu equipo.',
+      });
+      return;
+    }
+
     const equipo = {
       formacion: this.formacion,
       jugadores: this.jugadoresSeleccionados,
+      tecnico: this.selectedCoach,
       puntajeTotal: this.getTotalGlobal(),
     };
 
-    // ✅ Guardar equipo por usuario logueado
     localStorage.setItem(this.storageKey, JSON.stringify(equipo));
     this.equipoGuardado = true;
+
+    // ✅ Notificar a otros componentes (Home, Menú, etc.)
+    window.dispatchEvent(new Event('storage'));
 
     Swal.fire({
       icon: 'success',
       title: 'Equipo guardado',
-      text: 'Tu equipo se ha guardado correctamente',
+      text: 'Tu equipo y técnico se han guardado correctamente',
       timer: 1500,
       showConfirmButton: false,
     });
   }
 
-  verTablero() {
+  // ✅ Validación mejorada para evitar error si no hay equipo guardado
+  verTablero(): void {
+    const equipoGuardado = localStorage.getItem(this.storageKey);
+
+    if (!equipoGuardado) {
+      Swal.fire({
+        icon: 'info',
+        title: 'Sin equipo guardado',
+        text: 'Primero debes crear y guardar tu equipo antes de ver el tablero táctico.',
+        confirmButtonText: 'Entendido',
+      });
+      return;
+    }
+
     this.router.navigate(['/equipos/visual']);
   }
 }

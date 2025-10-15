@@ -5,6 +5,7 @@
   padding: 1rem 0;
   display: flex;
   flex-direction: column;
+  font-family: 'Poppins', sans-serif;
 
   ul {
     list-style: none;
@@ -32,7 +33,7 @@
         }
 
         &:hover {
-          background: rgba(255, 255, 255, 0.08);
+          background: rgba(255, 255, 255, 0.1);
           transform: translateX(6px);
         }
 
@@ -81,12 +82,14 @@
   .submenu-content {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.35s ease;
+    transition: max-height 0.35s ease, opacity 0.25s ease;
+    opacity: 0;
     display: flex;
     flex-direction: column;
 
     &.open {
       max-height: 250px;
+      opacity: 1;
     }
 
     a {
@@ -111,6 +114,32 @@
         transform: translateX(5px);
       }
     }
+  }
+}
+
+/* === Botones especiales === */
+.logout a {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffe4c4;
+
+  mat-icon {
+    color: #ffe4c4;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateX(4px);
+  }
+}
+
+.login a {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  font-weight: 600;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.12);
+    transform: translateX(4px);
   }
 }
 

@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
 import { SquadStateService } from '../features/equipos/services/squad-state.service';
 import { UserService, User } from '../auth/services/user.service';
 
@@ -25,7 +26,7 @@ interface Noticia {
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
   user: User | null = null;
   userName = 'Manager';
 
@@ -33,8 +34,8 @@ export class HomeComponent implements OnInit {
   formacion = '';
   puntajeTotal = 0;
   jugadoresSeleccionados: Player[] = [];
-
-  showToast = false; // 🔹 aparece cuando no tiene equipo
+  showToast = false;
+  private storageListener: any;
 
   liga: Liga = {
     nombre: 'Liga Colombiana',
@@ -54,14 +55,25 @@ export class HomeComponent implements OnInit {
     { player: 'Luis Sandoval', note: 'Duda para el próximo partido.', type: 'duda' },
   ];
 
-  constructor(private squad: SquadStateService, private userService: UserService) {}
+  constructor(
+    private squad: SquadStateService,
+    private userService: UserService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.loadUserAndTeam();
-    window.addEventListener('storage', () => this.loadUserAndTeam());
+
+    // 🔁 Escucha los cambios globales en sesión o equipos
+    this.storageListener = () => this.loadUserAndTeam();
+    window.addEventListener('storage', this.storageListener);
   }
 
-  /** Cargar usuario actual y su equipo */
+  ngOnDestroy(): void {
+    window.removeEventListener('storage', this.storageListener);
+  }
+
+  /** ✅ Carga datos del usuario y su equipo */
   loadUserAndTeam(): void {
     this.user = this.userService.getUser();
 
@@ -77,37 +89,39 @@ export class HomeComponent implements OnInit {
         this.puntajeTotal = equipo.puntajeTotal || 0;
         this.equipoGuardado = true;
         this.squad.setFormation(this.formacion);
+        this.showToast = false;
         return;
       }
     }
 
-    // 🧹 Si no hay usuario o equipo
+    // 🔹 Sin usuario o sin equipo
+    this.userName = 'Manager';
     this.equipoGuardado = false;
     this.formacion = '';
     this.puntajeTotal = 0;
     this.jugadoresSeleccionados = [];
-
-    // ✅ Mostramos el aviso tipo toast (solo informativo)
     this.showToast = true;
     setTimeout(() => (this.showToast = false), 4000);
   }
 
-  /** Ver tablero táctico */
-  verTablero() {
+  /** 👁️ Ver tablero táctico */
+  verTablero(): void {
     if (this.user && this.equipoGuardado) {
-      window.location.href = '/equipos/visual';
+      this.router.navigate(['/equipos/visual']);
     } else {
-      window.location.href = '/login';
+      this.router.navigate(['/login']);
     }
   }
 
-  /** Editar o crear equipo */
-  editarAlineacion() {
+  /** ✏️ Crear o editar alineación */
+  editarAlineacion(): void {
     if (this.user) {
-      const destino = this.equipoGuardado ? '/equipos/mi-equipo' : '/equipos/crear';
-      window.location.href = destino;
+      const destino = this.equipoGuardado
+        ? '/equipos/mi-equipo'
+        : '/equipos/crear';
+      this.router.navigate([destino]);
     } else {
-      window.location.href = '/login';
+      this.router.navigate(['/login']);
     }
   }
 }

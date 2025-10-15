@@ -1,4 +1,3 @@
-/* 🔹 Contenedor principal */
 .my-team-container {
   padding: 1.5rem;
   background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
@@ -40,11 +39,6 @@
       background: #f1f5f9;
       color: #0f172a;
       border: 1px solid #cbd5e1;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-
-      mat-icon {
-        font-size: 20px;
-      }
 
       &:hover {
         background: #dbeafe;
@@ -55,30 +49,24 @@
         background: linear-gradient(135deg, #2563eb, #1e3a8a);
         color: #fff;
         border-color: #1d4ed8;
-        box-shadow: 0 3px 10px rgba(37, 99, 235, 0.35);
       }
     }
   }
 
-  /* 🔹 Contenedor del bloque de equipos */
+  /* 🔹 Bloques de equipos */
   .team-block {
     background: #ffffff;
     border-radius: 14px;
-    padding: 1.2rem 1.4rem;
+    padding: 1.5rem;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
     margin-bottom: 1.4rem;
     border-left: 5px solid #2563eb;
     transition: all 0.3s ease;
 
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
-    }
-
     h3 {
       color: #1e40af;
-      margin-bottom: 0.5rem;
       font-weight: 700;
+      margin-bottom: 1rem;
 
       small {
         font-weight: 400;
@@ -89,25 +77,23 @@
     .players-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 0.8rem;
-      transition: all 0.3s ease;
+      gap: 1rem;
     }
 
-    /* 🔹 Tarjeta de jugador */
+    /* 🔹 Cartas de jugadores mejoradas */
     .player-card {
-      background: #e2e8f0;
-      border-radius: 10px;
-      padding: 0.8rem;
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 1rem;
       text-align: center;
       cursor: pointer;
-      transition: all 0.25s ease, opacity 0.25s ease;
+      transition: all 0.25s ease;
       border: 2px solid transparent;
       position: relative;
-      opacity: 1;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 
       &:hover {
-        background: #bfdbfe;
+        background: #eff6ff;
         transform: translateY(-3px);
       }
 
@@ -115,55 +101,137 @@
         background: linear-gradient(135deg, #1e40af, #2563eb);
         color: #fff;
         border-color: #1d4ed8;
-        transform: scale(1.05);
+        transform: scale(1.04);
         box-shadow: 0 6px 14px rgba(29, 78, 216, 0.35);
+      }
 
-        &::after {
-          content: '✓';
-          position: absolute;
-          top: 6px;
-          right: 10px;
-          font-size: 1rem;
-          color: #fff;
-          background: rgba(255, 255, 255, 0.2);
-          border-radius: 50%;
-          width: 22px;
-          height: 22px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          backdrop-filter: blur(4px);
-        }
+      .nombre {
+        display: block;
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: inherit;
+        margin-bottom: 0.15rem;
+      }
+
+      small {
+        display: block;
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: #475569;
+        margin-bottom: 0.4rem;
       }
 
       .rating {
         font-size: 0.85rem;
-        font-weight: 600;
+        font-weight: 700;
         color: #2563eb;
-        display: block;
-        margin-top: 0.3rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        background: rgba(37, 99, 235, 0.08);
+        padding: 0.25rem 0.5rem;
+        border-radius: 6px;
+
+        mat-icon,
+        svg,
+        span {
+          vertical-align: middle;
+        }
       }
 
-      span {
-        display: block;
-      }
-
-      small {
-        font-size: 0.8rem;
-        color: #334155;
+      &.selected .rating {
+        background: rgba(255, 255, 255, 0.25);
+        color: #fff;
       }
     }
   }
 
-  /* 🔹 Footer inferior */
+  /* 🔹 Sección de coaches */
+  .coach-section {
+    background: #fff;
+    border-radius: 14px;
+    padding: 1.5rem;
+    margin-top: 2rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+
+    h3 {
+      color: #1e40af;
+      margin-bottom: 1rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .coach-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1rem;
+      max-height: 300px;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+    }
+
+    .coach-card {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 0.8rem 1.2rem;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+
+      &:hover {
+        background: #eff6ff;
+        transform: translateY(-3px);
+      }
+
+      &.selected {
+        border-color: #1d4ed8;
+        background: linear-gradient(135deg, #1e40af, #2563eb);
+        color: #fff;
+        box-shadow: 0 6px 14px rgba(29, 78, 216, 0.3);
+      }
+
+      .avatar {
+        background: #2563eb;
+        color: #fff;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .info {
+        flex: 1;
+        h4 {
+          margin: 0;
+          font-weight: 700;
+        }
+        p {
+          margin: 0;
+          font-size: 0.75rem;
+          color: #64748b;
+        }
+      }
+
+      .check mat-icon {
+        color: #22c55e;
+      }
+    }
+  }
+
   .footer {
     margin-top: 2rem;
     text-align: right;
 
     p {
-      margin-bottom: 0.4rem;
       font-weight: 600;
       color: #0f172a;
+      margin-bottom: 0.4rem;
     }
 
     button {
@@ -172,20 +240,17 @@
       text-transform: uppercase;
       padding: 0.6rem 1.4rem;
       background: linear-gradient(135deg, #1e40af, #1d4ed8);
-      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
       color: #fff;
-      transition: all 0.3s ease;
 
       &:hover {
         background: linear-gradient(135deg, #2563eb, #1e3a8a);
-        box-shadow: 0 8px 18px rgba(29, 78, 216, 0.3);
         transform: translateY(-2px);
       }
     }
   }
 }
 
-/* 🔹 Botón flotante “Ver tablero táctico” */
+/* 🔹 Botón flotante */
 .btn-tablero {
   position: fixed;
   right: 28px;
@@ -198,48 +263,6 @@
   align-items: center;
   gap: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-  transition: all 0.3s ease;
-  animation: slideIn 0.6s ease forwards;
   border: none;
-  z-index: 2000; /* ✅ más alto que el header */
-
-  mat-icon {
-    font-size: 22px;
-  }
-
-  &:hover {
-    background: linear-gradient(135deg, #1d4ed8, #172554);
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
-  }
+  z-index: 2000;
 }
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* 🔹 Ajuste automático del top se hace desde el TS */
-
-/* 🔹 Responsividad */
-@media (max-width: 768px) {
-  .btn-tablero {
-    top: auto !important;
-    bottom: 20px;
-    right: 20px;
-    font-size: 0.85rem;
-    padding: 0.5rem 0.9rem;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-  }
-}
-
-  .team-block .players-grid {
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  }
-  

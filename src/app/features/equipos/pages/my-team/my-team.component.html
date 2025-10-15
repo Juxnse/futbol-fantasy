@@ -1,4 +1,4 @@
-<!-- 🔹 BOTÓN FLOTANTE — solo visible si hay equipo guardado -->
+<!-- 🔹 BOTÓN FLOTANTE -->
 <button
   *ngIf="equipoGuardado"
   class="btn-tablero"
@@ -19,39 +19,76 @@
     <button
       mat-stroked-button
       *ngFor="let f of filtros"
-      [color]="filtro === f.value ? 'primary' : undefined"
-      [class.active]="filtro === f.value"
-      (click)="setFiltro(f.value)"
+      [color]="filtro === f.value && modo === 'jugadores' ? 'primary' : undefined"
+      [class.active]="filtro === f.value && modo === 'jugadores'"
+      (click)="setFiltro(f.value); modo = 'jugadores'"
     >
       <mat-icon>{{ f.icon }}</mat-icon> {{ f.label }}
     </button>
+
+    <!-- 🔹 Nuevo botón para Técnicos -->
+    <button
+      mat-stroked-button
+      [class.active]="modo === 'tecnicos'"
+      (click)="modo = 'tecnicos'"
+    >
+      <mat-icon>person</mat-icon> Técnicos
+    </button>
   </div>
 
-  <!-- 🔹 Equipos y jugadores -->
-  <div *ngFor="let equipo of equipos" class="team-block">
-    <h3>{{ equipo.nombre }} <small>({{ equipo.tecnico }})</small></h3>
+  <!-- 🔹 Vista Jugadores -->
+  <ng-container *ngIf="modo === 'jugadores'">
+    <div *ngFor="let equipo of equipos" class="team-block">
+      <h3>{{ equipo.nombre }} <small>({{ equipo.tecnico }})</small></h3>
 
-    <div class="players-grid">
-      <div
-        class="player-card"
-        *ngFor="let jugador of equipo.jugadores"
-        [class.selected]="isSelected(jugador.id)"
-        (click)="toggleJugador(jugador)"
-        [hidden]="
-          filtro &&
-          jugador.posicion.toLowerCase() !== filtro.toLowerCase()
-        "
-      >
-        <span class="nombre">{{ jugador.nombre }}</span>
-        <small>{{ jugador.posicion }}</small>
-        <span class="rating">⚽ {{ jugador.global | number:'1.1-1' }}</span>
+      <div class="players-grid">
+        <div
+          class="player-card"
+          *ngFor="let jugador of equipo.jugadores"
+          [class.selected]="isSelected(jugador.id)"
+          (click)="toggleJugador(jugador)"
+          [hidden]="
+            filtro &&
+            jugador.posicion.toLowerCase() !== filtro.toLowerCase()
+          "
+        >
+          <span class="nombre">{{ jugador.nombre }}</span>
+          <small>{{ jugador.posicion }}</small>
+          <span class="rating">⚽ {{ jugador.global | number: '1.1-1' }}</span>
+        </div>
       </div>
     </div>
-  </div>
+  </ng-container>
+
+  <!-- 🔹 Vista Técnicos -->
+  <ng-container *ngIf="modo === 'tecnicos'">
+    <div class="coach-section">
+      <h3>Selecciona tu Director Técnico</h3>
+      <div class="coach-list">
+        <div
+          *ngFor="let equipo of equipos"
+          class="coach-card"
+          [class.selected]="selectedCoach === equipo.tecnico"
+          (click)="toggleCoach(equipo.tecnico)"
+        >
+          <div class="avatar">
+            <mat-icon>person</mat-icon>
+          </div>
+          <div class="info">
+            <h4>{{ equipo.tecnico }}</h4>
+            <p>{{ equipo.nombre }}</p>
+          </div>
+          <div class="check" *ngIf="selectedCoach === equipo.tecnico">
+            <mat-icon>check_circle</mat-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
 
   <!-- 🔹 Footer -->
   <div class="footer">
-    <p>Puntaje total: {{ getTotalGlobal() | number:'1.1-1' }}</p>
+    <p>Puntaje total: {{ getTotalGlobal() | number: '1.1-1' }}</p>
     <button mat-raised-button color="primary" (click)="guardarEquipo()">
       Guardar equipo ({{ jugadoresSeleccionados.length }}/11)
     </button>
