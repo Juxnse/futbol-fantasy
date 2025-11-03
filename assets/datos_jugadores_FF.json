@@ -1,0 +1,450 @@
+{
+  "equipos": [
+    {
+      "nombre": "Atlético Nacional",
+      "ciudad": "Medellín",
+      "tecnico": "Diego Arias",
+      "jugadores": [
+        {
+          "id": 1,
+          "nombre": "David Ospina",
+          "posicion": "Portero"
+        },
+        {
+          "id": 2,
+          "nombre": "Harlen Castillo",
+          "posicion": "Portero"
+        },
+        {
+          "id": 3,
+          "nombre": "Luis Marquinez",
+          "posicion": "Portero"
+        },
+        {
+          "id": 4,
+          "nombre": "Cesar Haydar",
+          "posicion": "Defensa"
+        },
+        {
+          "id": 5,
+          "nombre": "Andres Román",
+          "posicion": "Defensa"
+        },
+        {
+          "id": 6,
+          "nombre": "Camilo Cándido",
+          "posicion": "Defensa"
+        },
+        {
+          "id": 7,
+          "nombre": "William Tesillo",
+          "posicion": "Defensa"
+        },
+        {
+          "id": 8,
+          "nombre": "Andres Salazar",
+          "posicion": "Defensa"
+        },
+        {
+          "id": 9,
+          "nombre": "Joan Castro",
+          "posicion": "Defensa"
+        },
+        {
+          "id": 10,
+          "nombre": "Juan José Arias",
+          "posicion": "Defensa"
+        },
+        {
+          "id": 11,
+          "nombre": "Simon Garcia",
+          "posicion": "Defensa"
+        },
+        {
+          "id": 12,
+          "nombre": "Elkin Rivero",
+          "posicion": "Mediocampista"
+        },
+        {
+          "id": 13,
+          "nombre": "Kilian Toscano",
+          "posicion": "Mediocampista"
+        },
+        {
+          "id": 14,
+          "nombre": "Matheus Uribe",
+          "posicion": "Mediocampista"
+        },
+        {
+          "id": 15,
+          "nombre": "Edwin Cardona",
+          "posicion": "Mediocampista"
+        },
+        {
+          "id": 16,
+          "nombre": "Jorman Campuzano",
+          "posicion": "Mediocampista"
+        },
+        {
+          "id": 17,
+          "nombre": "Juan Bauza",
+          "posicion": "Mediocampista"
+        },
+        {
+          "id": 18,
+          "nombre": "Juan Zapata",
+          "posicion": "Mediocampista"
+        },
+        {
+          "id": 19,
+          "nombre": "Alfredo Morelos",
+          "posicion": "Delantero"
+        },
+        {
+          "id": 20,
+          "nombre": "Yair Mena",
+          "posicion": "Delantero"
+        },
+        {
+          "id": 21,
+          "nombre": "Marlos Morenos",
+          "posicion": "Delantero"
+        },
+        {
+          "id": 22,
+          "nombre": "Billy Arce",
+          "posicion": "Delantero"
+        },
+        {
+          "id": 23,
+          "nombre": "Marino Hinestroza",
+          "posicion": "Delantero"
+        },
+        {
+          "id": 24,
+          "nombre": "Facundo Batista",
+          "posicion": "Delantero"
+        },
+        {
+          "id": 25,
+          "nombre": "Dairon Asprilla",
+          "posicion": "Delantero"
+        },
+        {
+          "id": 26,
+          "nombre": "Andres Sarmiento",
+          "posicion": "Delantero"
+        }
+      ]
+    },
+    {
+      "nombre": "Independiente Medellín",
+      "ciudad": "Medellín",
+      "tecnico": "Alejandro Restrepo",
+      "jugadores": [
+        {
+          "id": 27,
+          "nombre": "Washington Aguerre",
+          "posicion": "Portero"
+        },
+        {
+          "id": 28,
+          "nombre": "José Chunga",
+          "posicion": "Portero"
+        },
+        {
+          "id": 29,
+          "nombre": "Eder Chaux",
+          "posicion": "Portero"
+        },
+        {
+          "id": 30,
+          "nombre": "Esneyder Mena",
+          "posicion": "Defensa"
+        },
+        {
+          "id": 31,
+          "nombre": "Yeferson Rodallega",
+          "posicion": "Defensa"
+        },
+        {
+          "id": 32,
+          "nombre": "Kevin Mantilla",
+          "posicion": "Defensa"
+        },
+        {
+          "id": 33,
+          "nombre": "Leyser Chaverra",
+          "posicion": "Defensa"
+        },
+        {
+          "id": 34,
+          "nombre": "Jhon Palacios",
+          "posicion": "Defensa"
+        },
+        {
+          "id": 35,
+          "nombre": "Daniel Londoño",
+          "posicion": "Defensa"
+        },
+        {
+          "id": 36,
+          "nombre": "Fainer Torijano",
+          "posicion": "Defensa"
+        },
+        {
+          "id": 37,
+          "nombre": "Jose Ortiz",
+          "posicion": "Defensa"
+        },
+        {
+          "id": 38,
+          "nombre": "Jarlan Barrera",
+          "posicion": "Mediocampista"
+        },
+        {
+          "id": 39,
+          "nombre": "Alexis Serna",
+          "posicion": "Mediocampista"
+        },
+        {
+          "id": 40,
+          "nombre": "David Loaiza",
+          "posicion": "Mediocampista"
+        },
+        {
+          "id": 41,
+          "nombre": "Léider Berrio",
+          "posicion": "Mediocampista"
+        },
+        {
+          "id": 42,
+          "nombre": "Marcus Vinicius",
+          "posicion": "Mediocampista"
+        },
+        {
+          "id": 43,
+          "nombre": "Baldomero Perlaza",
+          "posicion": "Mediocampista"
+        },
+        {
+          "id": 44,
+          "nombre": "Jaime Alvarado",
+          "posicion": "Mediocampista"
+        },
+        {
+          "id": 45,
+          "nombre": "Juan Arizala",
+          "posicion": "Mediocampista"
+        },
+        {
+          "id": 46,
+          "nombre": "Diego Moreno",
+          "posicion": "Mediocampista"
+        },
+        {
+          "id": 47,
+          "nombre": "Jader Valencia",
+          "posicion": "Delantero"
+        },
+        {
+          "id": 48,
+          "nombre": "Juan Bonilla",
+          "posicion": "Delantero"
+        },
+        {
+          "id": 49,
+          "nombre": "Mender García",
+          "posicion": "Delantero"
+        },
+        {
+          "id": 50,
+          "nombre": "Luis Sandoval",
+          "posicion": "Delantero"
+        },
+        {
+          "id": 51,
+          "nombre": "Francisco Chaverra",
+          "posicion": "Delantero"
+        },
+        {
+          "id": 52,
+          "nombre": "Francisco Fydriszewski",
+          "posicion": "Delantero"
+        },
+        {
+          "id": 53,
+          "nombre": "Bryan León",
+          "posicion": "Delantero"
+        }
+      ]
+    },
+    {
+      "nombre": "América de Cali",
+      "ciudad": "Cali",
+      "tecnico": "David González",
+      "jugadores": [
+        {
+          "id": 54,
+          "nombre": "Santiago Silva",
+          "posicion": "Portero"
+        },
+        {
+          "id": 55,
+          "nombre": "Joel David Graterol",
+          "posicion": "Portero"
+        },
+        {
+          "id": 56,
+          "nombre": "Jorge Soto",
+          "posicion": "Portero"
+        },
+        {
+          "id": 57,
+          "nombre": "David Quintero",
+          "posicion": "Portero"
+        },
+        {
+          "id": 58,
+          "nombre": "Omar Bertel",
+          "posicion": "Defensa"
+        },
+        {
+          "id": 59,
+          "nombre": "Nico Hernández",
+          "posicion": "Defensa"
+        },
+        {
+          "id": 60,
+          "nombre": "Josen Escobar",
+          "posicion": "Defensa"
+        },
+        {
+          "id": 61,
+          "nombre": "Brayan Correa",
+          "posicion": "Defensa"
+        }, 
+        {
+          "id": 62,
+          "nombre": "Manuel Caicedo",
+          "posicion": "Defensa"
+        },
+        {
+          "id": 63,
+          "nombre": "Daniel Bocanegra",
+          "posicion": "Defensa"
+        },
+        {
+          "id": 64,
+          "nombre": "Andrés Mosquera",
+          "posicion": "Defensa"
+        },
+        {
+          "id": 65,
+          "nombre": "Cristian Tovar",
+          "posicion": "Defensa"
+        },
+        {
+          "id": 66,
+          "nombre": "Mateo Castillo",
+          "posicion": "Defensa"
+        },
+        {
+          "id": 67,
+          "nombre": "Marcos Mina",
+          "posicion": "Defensa"
+        },
+        {
+          "id": 68,
+          "nombre": "Yerson Candelo",
+          "posicion": "Defensa"
+        },
+        {
+          "id": 69,
+          "nombre": "Andrés Tello",
+          "posicion": "Mediocampista"
+        },
+        {
+          "id": 70,
+          "nombre": "Rafael Carrascal",
+          "posicion": "Mediocampista"
+        },
+        {
+          "id": 71,
+          "nombre": "Andres Roa",
+          "posicion": "Mediocampista"
+        },
+        {
+          "id": 72,
+          "nombre": "Jean Carlos Pestaña",
+          "posicion": "Mediocampista"
+        },
+        {
+          "id": 73,
+          "nombre": "Kener Gonzalez",
+          "posicion": "Mediocampista"
+        },
+        {
+          "id": 74,
+          "nombre": "Éder Balanta",
+          "posicion": "Mediocampista"
+        },
+        {
+          "id": 75,
+          "nombre": "Luis Alejandro Paz",
+          "posicion": "Mediocampista"
+        },
+        {
+          "id": 76,
+          "nombre": "Sebastian Navarro",
+          "posicion": "Mediocampista"
+        },
+        {
+          "id": 77,
+          "nombre": "Franco Leys",
+          "posicion": "Mediocampista"
+        },
+        {
+          "id": 78,
+          "nombre": "Adrian Ramos",
+          "posicion": "Mediocampista"
+        },
+        {
+          "id": 79,
+          "nombre": "Jhon Murillo",
+          "posicion": "Delantero"
+        },
+        {
+          "id": 80,
+          "nombre": "Dylan Borrero",
+          "posicion": "Delantero"
+        },
+        {
+          "id": 81,
+          "nombre": "Luis Ramos",
+          "posicion": "Delantero"
+        },
+        {
+          "id": 82,
+          "nombre": "Yojan Garcés",
+          "posicion": "Delantero"
+        },
+        {
+          "id": 83,
+          "nombre": "Cristian Barrios",
+          "posicion": "Delantero"
+        },
+        {
+          "id": 84,
+          "nombre": "Rodrigo Holgado",
+          "posicion": "Delantero"
+        },
+        {
+          "id": 85,
+          "nombre": "Jan Lucumi",
+          "posicion": "Delantero"
+        }
+      ]
+    }
+  ]
+}
